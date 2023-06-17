@@ -1,11 +1,12 @@
 package io.yeahx4.jasao.controller
 
+import io.yeahx4.jasao.dto.LoginDto
 import io.yeahx4.jasao.dto.SignUpDto
+import io.yeahx4.jasao.dto.UserDto
 import io.yeahx4.jasao.entity.User
 import io.yeahx4.jasao.role.UserRole
 import io.yeahx4.jasao.service.UserService
-import io.yeahx4.jasao.util.MessageHttpResponse
-import io.yeahx4.jasao.util.MsgRes
+import io.yeahx4.jasao.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
@@ -41,5 +42,22 @@ class UserController(private val userService: UserService) {
 
             MsgRes(MessageHttpResponse("Success"), HttpStatus.CREATED)
         }
+    }
+
+    @PostMapping("/login")
+    fun login(@RequestBody dto: LoginDto): Res<UserDto> {
+        val user: User? = if (isEmail(dto.email)) {
+            this.userService.getUserByEmail(dto.email)
+        } else {
+            this.userService.getUserByUsername(dto.email)
+        }
+
+        if (user == null) {
+            logger.info("Log in attempt failed: ${dto.email}")
+            return Res(HttpResponse("Invalid credentials.", null), HttpStatus.NOT_FOUND)
+        }
+
+        logger.info("Log in successful: ${dto.email}")
+        return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
 }
