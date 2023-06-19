@@ -57,6 +57,13 @@ class UserController(private val userService: UserService) {
             return Res(HttpResponse("Invalid credentials.", null), HttpStatus.NOT_FOUND)
         }
 
+        val match = this.userService.matchPassword(dto.password, user.password)
+
+        if (!match) {
+            logger.info("Log in attempt failed: ${dto.email}")
+            return Res(HttpResponse("Invalid credentials.", null), HttpStatus.NOT_FOUND)
+        }
+
         logger.info("Log in successful: ${dto.email}")
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
