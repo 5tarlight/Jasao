@@ -1,4 +1,4 @@
-package io.yeahx4.jasao.service
+package io.yeahx4.jasao.service.auth
 
 import io.yeahx4.jasao.repository.UserRepository
 import org.springframework.security.core.userdetails.UserDetails

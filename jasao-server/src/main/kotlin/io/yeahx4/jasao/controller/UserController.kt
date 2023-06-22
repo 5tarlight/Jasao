@@ -4,9 +4,10 @@ import io.yeahx4.jasao.dto.LoginDto
 import io.yeahx4.jasao.dto.LoginResDto
 import io.yeahx4.jasao.dto.SignUpDto
 import io.yeahx4.jasao.entity.User
+import io.yeahx4.jasao.service.auth.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
 import io.yeahx4.jasao.role.UserRole
-import io.yeahx4.jasao.service.UserService
+import io.yeahx4.jasao.service.auth.UserService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.MessageHttpResponse
 import io.yeahx4.jasao.util.MsgRes
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val userService: UserService,
     private val jwtTokenProvider: JwtTokenProvider,
+    private val jwtService: JwtService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -76,8 +79,9 @@ class UserController(
         return Res(HttpResponse("Ok", user.toDto().toLoginRes(token)), HttpStatus.OK)
     }
 
-    @PostMapping("test")
-    fun test(): String {
-        return "Welcome!"
+    @PostMapping("/test")
+    fun test(@RequestHeader("Authorization") token: String): String {
+        val user = jwtService.getEmailFromToken(token)
+        return "Welcome ${user.getRealUsername()}"
     }
 }

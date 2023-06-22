@@ -14,7 +14,7 @@ import java.util.Date
 
 @Component
 class JwtTokenProvider(private val userDetailsService: UserDetailsService) {
-    private var secret = "xvljkzviuwaeffljhasdfljknasvlxcvpipupiu"
+    private var secret = "xvljkzviuwaeffljhasdfljknasvlxcvpipupiu" // TODO : This is for dev!
     private val validTime = 30 * 60 * 1000L
 
     // Encode secret with Base64 in constructor
