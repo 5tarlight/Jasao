@@ -81,7 +81,7 @@ class UserController(
 
     @PostMapping("/test")
     fun test(@RequestHeader("Authorization") token: String): String {
-        val user = jwtService.getEmailFromToken(token)
+        val user = jwtService.getUserFromToken(token)
         return "Welcome ${user.getRealUsername()}"
     }
 }
