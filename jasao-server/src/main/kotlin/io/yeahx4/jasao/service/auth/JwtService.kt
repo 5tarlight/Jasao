@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service
 
 @Service
 class JwtService {
-    fun getEmailFromToken(token: String): User {
+    fun getUserFromToken(token: String): User {
         val auth = SecurityContextHolder.getContext().authentication
 
         return auth.principal as User
