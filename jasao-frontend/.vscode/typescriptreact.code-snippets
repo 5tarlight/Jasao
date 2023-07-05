@@ -1,0 +1,12 @@
+{
+  "React classnames bind": {
+    "scope": "typescriptreact",
+    "prefix": "cxgen",
+    "body": [
+      "import styles from \"../../styles/$TM_FILENAME_BASE.module.scss\";",
+      "import classNames from \"classnames/bind\";",
+      "",
+      "const cx = classNames.bind(styles);"
+    ]
+  }
+}
