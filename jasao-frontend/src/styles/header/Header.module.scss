@@ -58,3 +58,15 @@
     background-color: $pri-dark;
   }
 }
+
+.logo {
+  user-select: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.logo-text {
+  color: $pri-dark;
+}

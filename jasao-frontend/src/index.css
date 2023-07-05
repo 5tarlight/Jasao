@@ -5,3 +5,8 @@
   font-family: "Apple SD Gothic Neo", "맑은 고딕", "Malgun Gothic", 돋움, dotum,
     sans-serif;
 }
+
+a {
+  color: black;
+  text-decoration: none;
+}
