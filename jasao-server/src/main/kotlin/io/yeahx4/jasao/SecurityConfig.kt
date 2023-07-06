@@ -34,6 +34,7 @@ class SecurityConfig(
             .authorizeHttpRequests {
                 it
                     .requestMatchers("/user/auth/**").authenticated()
+                    .requestMatchers("/cafe/auth/**").authenticated()
                     .requestMatchers("/**").permitAll()
             }
             .addFilterBefore(
