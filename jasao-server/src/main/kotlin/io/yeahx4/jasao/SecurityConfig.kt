@@ -33,7 +33,7 @@ class SecurityConfig(
             }
             .authorizeHttpRequests {
                 it
-                    .requestMatchers("/user/test").authenticated()
+                    .requestMatchers("/user/auth/**").authenticated()
                     .requestMatchers("/**").permitAll()
             }
             .addFilterBefore(

@@ -37,3 +37,9 @@ data class LoginResDto(
     val role: UserRole,
     val token: String
 )
+
+data class UpdateUserDto(
+    val username: String?,
+    val password: String?,
+    val oldPassword: String
+)
