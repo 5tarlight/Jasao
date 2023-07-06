@@ -14,6 +14,7 @@ import io.yeahx4.jasao.util.MessageHttpResponse
 import io.yeahx4.jasao.util.MsgRes
 import io.yeahx4.jasao.util.Res
 import io.yeahx4.jasao.util.isEmail
+import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PatchMapping
@@ -87,6 +88,7 @@ class UserController(
 //        return "Welcome ${user.getRealUsername()}"
 //    }
 
+    @Transactional
     @PatchMapping("/auth/update")
     fun update(
         @RequestHeader("Authorization") token: String,
@@ -99,12 +101,16 @@ class UserController(
             return Res(HttpResponse("Invalid Credential", null), HttpStatus.FORBIDDEN)
         }
 
+        val tUser = this.userService.getUserByEmail(user.getEmail())!!
+
         if (dto.username != null) {
-            user.setRealUsername(dto.username)
+            logger.info("Update user ${user.getRealUsername()}(${user.id})'s username ${dto.username}")
+            tUser.setRealUsername(dto.username)
         }
 
         if (dto.password != null) {
-            user.setEncryptedPassword(this.userService.encrypt(dto.password))
+            logger.info("Update user ${user.getRealUsername()}(${user.id})'s password")
+            tUser.setEncryptedPassword(this.userService.encrypt(dto.password))
         }
 
         return Res(HttpResponse("Success", null), HttpStatus.OK)
