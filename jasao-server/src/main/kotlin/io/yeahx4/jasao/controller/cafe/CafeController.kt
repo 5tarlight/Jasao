@@ -27,10 +27,20 @@ class CafeController(
         @RequestBody dto: CreateCafeDto
     ): Res<String> {
         val user = this.jwtService.getUserFromToken(token)
+
+        val cafe = this.cafeService.getCafeByIdentifier(dto.identifier)
+
+        if (cafe != null) {
+            this.logger.info(
+                "Cafe creation attempt failed: Taken identifier(${dto.identifier}) by ${user.getRealUsername()}(${user.id})"
+            )
+            return Res(HttpResponse("Taken identifier", null), HttpStatus.BAD_REQUEST)
+        }
+
         this.cafeService.create(dto, user.id)
 
         this.logger.info(
-            "New cafe created: ${dto.name} identified ${dto.identifier} by user ${user.username}(${user.id})"
+            "New cafe created: ${dto.name} identified ${dto.identifier} by user ${user.getRealUsername()}(${user.id})"
         )
 
         return Res(HttpResponse("Success", null), HttpStatus.CREATED)

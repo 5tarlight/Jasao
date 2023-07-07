@@ -16,4 +16,8 @@ class CafeService(private val cafeRepository: CafeRepository) {
             owner
         ))
     }
+
+    fun getCafeByIdentifier(identifier: String): Cafe? {
+        return this.cafeRepository.findByIdentifier(identifier)
+    }
 }
