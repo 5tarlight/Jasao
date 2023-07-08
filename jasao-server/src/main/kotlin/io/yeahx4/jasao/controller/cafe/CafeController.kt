@@ -3,6 +3,7 @@ package io.yeahx4.jasao.controller.cafe
 import io.yeahx4.jasao.dto.cafe.CreateCafeDto
 import io.yeahx4.jasao.entity.cafe.Cafe
 import io.yeahx4.jasao.service.auth.JwtService
+import io.yeahx4.jasao.service.auth.UserService
 import io.yeahx4.jasao.service.cafe.CafeService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.Res
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/cafe")
 class CafeController(
     private val cafeService: CafeService,
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    private val userService: UserService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -58,5 +60,19 @@ class CafeController(
         } else {
             Res(HttpResponse("Ok", cafe), HttpStatus.OK)
         }
+    }
+
+    @GetMapping("/owner/{owner}")
+    fun getOwnerCafe(@PathVariable("owner") owner: Long): Res<List<Cafe>> {
+        val user = this.userService.getUserById(owner)
+
+        if (user == null) {
+            this.logger.info("Failed cafe list request by owner id: Unknown user $owner")
+            return Res(HttpResponse("Unknown User", null), HttpStatus.NOT_FOUND)
+        }
+
+        val cafes = this.cafeService.getAllCafeByOwner(owner)
+        logger.info("Successful cafe list request by owner id: $owner")
+        return Res(HttpResponse("Ok", cafes), HttpStatus.OK)
     }
 }
