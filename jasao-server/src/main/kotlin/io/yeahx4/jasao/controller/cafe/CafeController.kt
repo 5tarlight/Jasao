@@ -1,15 +1,18 @@
 package io.yeahx4.jasao.controller.cafe
 
 import io.yeahx4.jasao.dto.cafe.CreateCafeDto
+import io.yeahx4.jasao.dto.cafe.UpdateCafeDto
 import io.yeahx4.jasao.entity.cafe.Cafe
 import io.yeahx4.jasao.service.auth.JwtService
 import io.yeahx4.jasao.service.auth.UserService
 import io.yeahx4.jasao.service.cafe.CafeService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.Res
+import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -56,8 +59,10 @@ class CafeController(
         val cafe = this.cafeService.getCafeByIdentifier(identifier)
 
         return if (cafe == null) {
+            this.logger.info("Failed get cafe request: Unable to find cafe $identifier")
             Res(HttpResponse("Not Found", null), HttpStatus.NOT_FOUND)
         } else {
+            this.logger.info("Successful get cafe request: $identifier")
             Res(HttpResponse("Ok", cafe), HttpStatus.OK)
         }
     }
@@ -72,7 +77,47 @@ class CafeController(
         }
 
         val cafes = this.cafeService.getAllCafeByOwner(owner)
-        logger.info("Successful cafe list request by owner id: $owner")
+        this.logger.info("Successful cafe list request by owner id: $owner")
         return Res(HttpResponse("Ok", cafes), HttpStatus.OK)
+    }
+
+    @Transactional
+    @PatchMapping("/auth/update")
+    fun updateCafe(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody dto: UpdateCafeDto
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(token)
+        val cafe = this.cafeService.getCafeById(dto.cafe)
+
+        if (cafe == null) {
+            this.logger.info(
+                "Failed cafe update request by user ${user.id}: Unable to find cafe ${dto.cafe}"
+            )
+            return Res(HttpResponse("Cafe Not Found", null), HttpStatus.NOT_FOUND)
+        }
+
+        if (!this.cafeService.isOwner(cafe, user)) {
+            this.logger.warn(
+                "Failed cafe update request by user ${user.id}: Not owner of ${dto.cafe}"
+            )
+            return Res(HttpResponse("Permission denied", null), HttpStatus.FORBIDDEN)
+        }
+
+        if (!this.userService.matchPassword(dto.oldPassword, user.password)) {
+            this.logger.warn("Failed cafe update request by user ${user.id}: Password mismatch")
+            return Res(HttpResponse("Password mismatch", null), HttpStatus.FORBIDDEN)
+        }
+
+        if (dto.name != null) {
+            cafe.name = dto.name
+        }
+
+        if (dto.description != null) {
+            cafe.description = dto.description
+        }
+
+        this.logger.info("Successfully cafe ${cafe.id} updated by user ${user.id}")
+        return Res(HttpResponse("Success", null), HttpStatus.OK)
     }
 }

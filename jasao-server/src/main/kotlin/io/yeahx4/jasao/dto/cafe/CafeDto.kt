@@ -5,3 +5,10 @@ data class CreateCafeDto(
     val identifier: String,
     val description: String?
 )
+
+data class UpdateCafeDto(
+    val oldPassword: String,
+    val cafe: Long,
+    val name: String?,
+    val description: String?
+)
