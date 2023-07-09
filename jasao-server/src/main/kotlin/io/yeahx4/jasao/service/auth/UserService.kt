@@ -3,6 +3,7 @@ package io.yeahx4.jasao.service.auth
 import io.yeahx4.jasao.dto.SignUpDto
 import io.yeahx4.jasao.entity.User
 import io.yeahx4.jasao.repository.UserRepository
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
@@ -43,5 +44,9 @@ class UserService(
 
     fun getUserByUsername(username: String): User? {
         return this.userRepository.findByUsername(username)
+    }
+
+    fun getUserById(id: Long): User? {
+        return this.userRepository.findByIdOrNull(id)
     }
 }

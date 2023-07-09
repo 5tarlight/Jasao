@@ -3,6 +3,7 @@ package io.yeahx4.jasao.controller
 import io.yeahx4.jasao.dto.LoginDto
 import io.yeahx4.jasao.dto.LoginResDto
 import io.yeahx4.jasao.dto.SignUpDto
+import io.yeahx4.jasao.dto.UpdateUserDto
 import io.yeahx4.jasao.entity.User
 import io.yeahx4.jasao.service.auth.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
@@ -13,8 +14,10 @@ import io.yeahx4.jasao.util.MessageHttpResponse
 import io.yeahx4.jasao.util.MsgRes
 import io.yeahx4.jasao.util.Res
 import io.yeahx4.jasao.util.isEmail
+import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
@@ -79,9 +82,37 @@ class UserController(
         return Res(HttpResponse("Ok", user.toDto().toLoginRes(token)), HttpStatus.OK)
     }
 
-    @PostMapping("/test")
-    fun test(@RequestHeader("Authorization") token: String): String {
-        val user = jwtService.getUserFromToken(token)
-        return "Welcome ${user.getRealUsername()}"
+//    @PostMapping("/auth/test")
+//    fun test(@RequestHeader("Authorization") token: String): String {
+//        val user = jwtService.getUserFromToken(token)
+//        return "Welcome ${user.getRealUsername()}"
+//    }
+
+    @Transactional
+    @PatchMapping("/auth/update")
+    fun update(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody dto: UpdateUserDto
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(token)
+        val pwMatch = this.userService.matchPassword(dto.oldPassword, user.password)
+
+        if (!pwMatch) {
+            return Res(HttpResponse("Invalid Credential", null), HttpStatus.FORBIDDEN)
+        }
+
+        val tUser = this.userService.getUserByEmail(user.getEmail())!!
+
+        if (dto.username != null) {
+            logger.info("Update user ${user.getRealUsername()}(${user.id})'s username ${dto.username}")
+            tUser.setRealUsername(dto.username)
+        }
+
+        if (dto.password != null) {
+            logger.info("Update user ${user.getRealUsername()}(${user.id})'s password")
+            tUser.setEncryptedPassword(this.userService.encrypt(dto.password))
+        }
+
+        return Res(HttpResponse("Success", null), HttpStatus.OK)
     }
 }
