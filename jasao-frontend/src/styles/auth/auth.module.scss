@@ -1,0 +1,116 @@
+@import "../Constant.scss";
+
+.aligner {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-content: center;
+}
+
+.container {
+  width: 30rem;
+  min-height: 35rem;
+  display: flex;
+  flex-direction: column;
+  border: 1.5px solid $dim;
+  border-radius: 5px;
+  margin-top: 5rem;
+  box-shadow: 0px 0px 1.2px -23px rgba(0, 0, 0, 0.015),
+    0px 0px 2.7px -23px rgba(0, 0, 0, 0.022),
+    0px 0px 4.6px -23px rgba(0, 0, 0, 0.027),
+    0px 0px 6.9px -23px rgba(0, 0, 0, 0.031),
+    0px 0px 10px -23px rgba(0, 0, 0, 0.035),
+    0px 0px 14.2px -23px rgba(0, 0, 0, 0.039),
+    0px 0px 20.1px -23px rgba(0, 0, 0, 0.043),
+    0px 0px 29.2px -23px rgba(0, 0, 0, 0.048),
+    0px 0px 45px -23px rgba(0, 0, 0, 0.055),
+    0px 0px 80px -23px rgba(0, 0, 0, 0.07);
+  justify-content: space-between;
+  padding: 2rem;
+  align-items: center;
+}
+
+.title {
+  font-size: 1.6rem;
+}
+
+.input-container {
+  width: 70%;
+}
+
+.input {
+  width: 100%;
+  height: 2.7rem;
+  padding: 0.5rem;
+  border: 1px solid $text-light;
+
+  &:focus {
+    outline: none;
+    border: 2px solid $pri;
+  }
+}
+
+.title-container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.subtitle {
+  color: $text-light;
+}
+
+.unable {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+
+  & a {
+    color: $link;
+
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+}
+
+.btn-container {
+  display: flex;
+  justify-content: right;
+  margin-top: 1rem;
+
+  & button {
+    background-color: $pri-acc;
+    color: white;
+    font-weight: bold;
+    border: none;
+    width: 5rem;
+    height: 2.5rem;
+    border-radius: 5px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+.menu-container {
+  margin-bottom: 2rem;
+  margin-top: -2rem;
+  display: flex;
+  justify-content: left;
+  flex-direction: column;
+  width: 70%;
+
+  & a {
+    color: $link;
+
+    &:hover {
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+}

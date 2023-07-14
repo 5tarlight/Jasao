@@ -10,3 +10,9 @@ a {
   color: black;
   text-decoration: none;
 }
+
+body,
+#root {
+  height: 100vh;
+  overflow: auto;
+}
