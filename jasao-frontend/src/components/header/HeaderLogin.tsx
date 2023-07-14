@@ -7,9 +7,9 @@ const cx = classNames.bind(styles);
 export default function HeaderLogin() {
   return (
     <div>
-      <button className={cx("login-btn")}>
-        <Link to={"/auth/login"}>로그인</Link>
-      </button>
+      <Link to={"/auth/login"}>
+        <button className={cx("login-btn")}>로그인</button>
+      </Link>
     </div>
   );
 }
