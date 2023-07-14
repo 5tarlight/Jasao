@@ -70,3 +70,17 @@
 .logo-text {
   color: $pri-dark;
 }
+
+.login-btn {
+  height: 2.4rem;
+  width: 6rem;
+  background-color: transparent;
+  border: 4px solid $pri;
+  font-size: 16px;
+  border-radius: 1.2rem;
+
+  &:hover {
+    background-color: $pri;
+    cursor: pointer;
+  }
+}
