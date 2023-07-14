@@ -4,7 +4,7 @@ import HeaderInput from "./HeaderInput";
 import HeaderLogo from "./HeaderLogo";
 import { useEffect, useState } from "react";
 import { getStorage } from "../../util/storage";
-import { Link } from "react-router-dom";
+import HeaderLogin from "./HeaderLogin";
 
 const cx = classNames.bind(styles);
 
@@ -25,7 +25,7 @@ export default function Header() {
         <div>
           <HeaderInput />
         </div>
-        {login ? <div>Welcome</div> : <Link to={"/login"}>로그인</Link>}
+        {login ? <div>Welcome</div> : <HeaderLogin />}
       </div>
     </header>
   );
