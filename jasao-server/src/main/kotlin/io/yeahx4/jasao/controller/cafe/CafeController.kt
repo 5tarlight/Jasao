@@ -6,6 +6,7 @@ import io.yeahx4.jasao.entity.cafe.Cafe
 import io.yeahx4.jasao.service.auth.JwtService
 import io.yeahx4.jasao.service.auth.UserService
 import io.yeahx4.jasao.service.cafe.CafeService
+import io.yeahx4.jasao.service.cafe.CafeSettingService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.Res
 import jakarta.transaction.Transactional
@@ -25,7 +26,8 @@ import org.springframework.web.bind.annotation.RestController
 class CafeController(
     private val cafeService: CafeService,
     private val jwtService: JwtService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val cafeSettingService: CafeSettingService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -45,11 +47,15 @@ class CafeController(
             return Res(HttpResponse("Taken identifier", null), HttpStatus.BAD_REQUEST)
         }
 
-        this.cafeService.create(dto, user.id)
+        val dbCafe = this.cafeService.create(dto, user.id)
 
         this.logger.info(
             "New cafe created: ${dto.name} identified ${dto.identifier} by user ${user.getRealUsername()}(${user.id})"
         )
+
+        this.cafeSettingService.createDefault(dbCafe.id)
+
+        this.logger.info("Setting of cafe ${dbCafe.name}(${dbCafe.id}) initiated.")
 
         return Res(HttpResponse("Success", null), HttpStatus.CREATED)
     }
