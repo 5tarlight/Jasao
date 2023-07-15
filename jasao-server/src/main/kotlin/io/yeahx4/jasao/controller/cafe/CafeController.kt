@@ -41,7 +41,7 @@ class CafeController(
         val cafe = this.cafeService.getCafeByIdentifier(dto.identifier)
 
         if (cafe != null) {
-            this.logger.info(
+            this.logger.warn(
                 "Cafe creation attempt failed: Taken identifier(${dto.identifier}) by ${user.getRealUsername()}(${user.id})"
             )
             return Res(HttpResponse("Taken identifier", null), HttpStatus.BAD_REQUEST)

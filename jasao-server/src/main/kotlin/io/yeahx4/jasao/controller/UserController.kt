@@ -38,9 +38,9 @@ class UserController(
         val check = this.userService.isDuplicatedSignup(dto)
         return if (!check.first) {
             if (check.second == "email")
-                logger.info("Sign up failed due to duplicated ${check.second}: ${dto.email}")
+                logger.warn("Sign up failed due to duplicated ${check.second}: ${dto.email}")
             else
-                logger.info("Sign up failed due to duplicated ${check.second}: ${dto.username}")
+                logger.warn("Sign up failed due to duplicated ${check.second}: ${dto.username}")
 
             MsgRes(MessageHttpResponse("Duplicated ${check.second}."), HttpStatus.BAD_REQUEST)
         } else {
@@ -66,14 +66,14 @@ class UserController(
         val user = this.userService.getUserByEmail(dto.email)
 
         if (user == null) {
-            logger.info("Log in attempt failed: ${dto.email} Unknown email")
+            logger.warn("Log in attempt failed: ${dto.email} Unknown email")
             return Res(HttpResponse("Invalid credentials.", null), HttpStatus.NOT_FOUND)
         }
 
         val match = this.userService.matchPassword(dto.password, user.password)
 
         if (!match) {
-            logger.info("Log in attempt failed: ${dto.email} Invalid password")
+            logger.warn("Log in attempt failed: ${dto.email} Invalid password")
             return Res(HttpResponse("Invalid credentials.", null), HttpStatus.NOT_FOUND)
         }
 
