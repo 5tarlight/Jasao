@@ -24,6 +24,7 @@ interface LoginRes {
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [warn, setWarn] = useState("");
 
   const handleLogin = () => {
     axios
@@ -51,7 +52,9 @@ export default function Login() {
 
         window.location.replace("/");
       })
-      .catch((err) => {});
+      .catch((err) => {
+        setWarn("로그인할 수 없습니다.");
+      });
   };
 
   return (
@@ -84,6 +87,7 @@ export default function Login() {
           <div className={cx("unable")}>
             <Link to={"/auth/problem"}>로그인할 수 없나요?</Link>
           </div>
+          <div className={cx("error-msg")}>{warn}</div>
           <div className={cx("btn-container")}>
             <button onClick={handleLogin}>로그인</button>
           </div>

@@ -37,6 +37,7 @@
 
 .input-container {
   width: 70%;
+  margin-top: -4rem;
 }
 
 .input {
@@ -99,7 +100,7 @@
 
 .menu-container {
   margin-bottom: 2rem;
-  margin-top: -2rem;
+  margin-top: -4rem;
   display: flex;
   justify-content: left;
   flex-direction: column;
@@ -113,4 +114,10 @@
       text-decoration: underline;
     }
   }
+}
+
+.error-msg {
+  color: red;
+  text-align: right;
+  margin-top: 2rem;
 }
