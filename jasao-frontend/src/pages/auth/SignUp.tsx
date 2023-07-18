@@ -1,10 +1,19 @@
 import { Link } from "react-router-dom";
 import styles from "../../styles/auth/auth.module.scss";
 import classNames from "classnames/bind";
+import { useState } from "react";
 
 const cx = classNames.bind(styles);
 
 export default function SignUp() {
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [warn, setWarn] = useState("");
+
+  const handleSubmit = () => {};
+
   return (
     <div className={cx("aligner")}>
       <div className={cx("container")}>
@@ -14,27 +23,49 @@ export default function SignUp() {
         </div>
 
         <div className={cx("input-container")}>
-          <input className={cx("input")} placeholder="이메일" type="email" />
-          <input className={cx("input")} placeholder="이름" type="text" />
+          <input
+            className={cx("input")}
+            placeholder="이메일"
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+          />
+          <input
+            className={cx("input")}
+            placeholder="이름"
+            type="text"
+            value={username}
+            onChange={(e) => {
+              setUsername(e.target.value);
+            }}
+          />
           <input
             className={cx("input")}
             placeholder="비밀번호"
             type="password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+            }}
           />
           <input
             className={cx("input")}
             placeholder="비밀번호 확인"
             type="password"
+            value={confirm}
+            onChange={(e) => {
+              setConfirm(e.target.value);
+            }}
           />
-          {/* <div className={cx("unable")}>
-            <Link to={"/auth/find"}>로그인할 수 없습니다.</Link>
-          </div> */}
+          <div className={cx("error-msg")}>{warn}</div>
           <div className={cx("btn-container")}>
-            <button>회원가입</button>
+            <button onClick={handleSubmit}>회원가입</button>
           </div>
         </div>
         <div className={cx("menu-container")}>
-          <Link to={"/auth/login"}>계정이 이미 있습니다.</Link>
+          <Link to={"/auth/login"}>계정이 이미 있으신가요?</Link>
         </div>
       </div>
     </div>

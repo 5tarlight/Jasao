@@ -3,7 +3,7 @@ import styles from "../../styles/auth/auth.module.scss";
 import classNames from "classnames/bind";
 import { useState } from "react";
 import axios from "axios";
-import { getServer } from "../../util/server";
+import { getServer, request } from "../../util/server";
 import { Memory, getStorage, saveStorage } from "../../util/storage";
 
 const cx = classNames.bind(styles);
@@ -27,16 +27,7 @@ export default function Login() {
   const [warn, setWarn] = useState("");
 
   const handleLogin = () => {
-    axios
-      .post<LoginRes>(
-        `${getServer()}/user/login`,
-        { email, password },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
+    request<LoginRes>("post", `${getServer()}/user/login`, { email, password })
       .then((res) => {
         const userData = res.data.data;
 
@@ -93,7 +84,7 @@ export default function Login() {
           </div>
         </div>
         <div className={cx("menu-container")}>
-          <Link to={"/auth/signup"}>계정이 없습니다.</Link>
+          <Link to={"/auth/signup"}>계정이 없으신가요?</Link>
         </div>
       </div>
     </div>
