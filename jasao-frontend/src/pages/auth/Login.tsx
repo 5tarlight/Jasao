@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import styles from "../../styles/auth/auth.module.scss";
 import classNames from "classnames/bind";
 import { useState } from "react";
-import axios from "axios";
 import { getServer, request } from "../../util/server";
 import { Memory, getStorage, saveStorage } from "../../util/storage";
 

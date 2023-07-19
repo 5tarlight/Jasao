@@ -1,7 +1,8 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "../../styles/auth/auth.module.scss";
 import classNames from "classnames/bind";
 import { useState } from "react";
+import { getServer, request } from "../../util/server";
 
 const cx = classNames.bind(styles);
 
@@ -11,8 +12,26 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [warn, setWarn] = useState("");
+  const navigate = useNavigate();
 
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    if (password !== confirm) {
+      setWarn("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+
+    request("post", `${getServer()}/user/signup`, {
+      email,
+      username,
+      password,
+    })
+      .then(() => {
+        navigate("/auth/login");
+      })
+      .catch(() => {
+        setWarn("이미 사용중인 이름이나 이메일입니다.");
+      });
+  };
 
   return (
     <div className={cx("aligner")}>
