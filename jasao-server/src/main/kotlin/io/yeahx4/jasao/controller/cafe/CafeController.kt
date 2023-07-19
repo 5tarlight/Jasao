@@ -6,6 +6,7 @@ import io.yeahx4.jasao.entity.cafe.Cafe
 import io.yeahx4.jasao.service.auth.JwtService
 import io.yeahx4.jasao.service.auth.UserService
 import io.yeahx4.jasao.service.cafe.CafeService
+import io.yeahx4.jasao.service.cafe.CafeSettingService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.Res
 import jakarta.transaction.Transactional
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -25,7 +27,8 @@ import org.springframework.web.bind.annotation.RestController
 class CafeController(
     private val cafeService: CafeService,
     private val jwtService: JwtService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val cafeSettingService: CafeSettingService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -39,17 +42,21 @@ class CafeController(
         val cafe = this.cafeService.getCafeByIdentifier(dto.identifier)
 
         if (cafe != null) {
-            this.logger.info(
+            this.logger.warn(
                 "Cafe creation attempt failed: Taken identifier(${dto.identifier}) by ${user.getRealUsername()}(${user.id})"
             )
             return Res(HttpResponse("Taken identifier", null), HttpStatus.BAD_REQUEST)
         }
 
-        this.cafeService.create(dto, user.id)
+        val dbCafe = this.cafeService.create(dto, user.id)
 
         this.logger.info(
             "New cafe created: ${dto.name} identified ${dto.identifier} by user ${user.getRealUsername()}(${user.id})"
         )
+
+        this.cafeSettingService.createDefault(dbCafe.id)
+
+        this.logger.info("Setting of cafe ${dbCafe.name}(${dbCafe.id}) initiated.")
 
         return Res(HttpResponse("Success", null), HttpStatus.CREATED)
     }
@@ -119,5 +126,10 @@ class CafeController(
 
         this.logger.info("Successfully cafe ${cafe.id} updated by user ${user.id}")
         return Res(HttpResponse("Success", null), HttpStatus.OK)
+    }
+
+    @GetMapping("/setting")
+    fun getCafeSetting(@RequestParam cafe: Long) {
+
     }
 }

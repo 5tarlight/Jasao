@@ -4,8 +4,17 @@ export interface LoginMemory {
   refresh: string; // NOT IMPLEMENTED
 }
 
+export interface UserMemory {
+  id: number;
+  email: string;
+  username: string;
+  token: string;
+  role: string;
+}
+
 export interface Memory {
-  user: LoginMemory | undefined;
+  login: LoginMemory | undefined | null;
+  user: UserMemory | undefined | null;
 }
 
 export const saveStorage = (data: Memory) => {
@@ -15,6 +24,6 @@ export const saveStorage = (data: Memory) => {
 export const getStorage = (): Memory | undefined => {
   const strData = localStorage.getItem("jasao-data");
 
-  if (strData === undefined || strData === null) return undefined;
+  if (strData === undefined || strData === null) return {} as Memory;
   else return JSON.parse(strData) as Memory;
 };

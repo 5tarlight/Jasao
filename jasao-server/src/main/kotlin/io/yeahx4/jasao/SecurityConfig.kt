@@ -9,13 +9,16 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.web.filter.CorsFilter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 @EnableWebSecurity
 @Configuration
 class SecurityConfig(
-    private val jwtTokenProvider: JwtTokenProvider
+    private val jwtTokenProvider: JwtTokenProvider,
 ): WebMvcConfigurer {
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
@@ -28,6 +31,7 @@ class SecurityConfig(
         http
             .httpBasic { it.disable() }
             .csrf { it.disable() }
+            .addFilter(corsFilter())
             .sessionManagement {
                 it.sessionCreationPolicy(STATELESS)
             }
@@ -43,5 +47,26 @@ class SecurityConfig(
             )
 
         return http.build()
+    }
+
+    @Bean
+    fun corsFilter(): CorsFilter {
+        val source = UrlBasedCorsConfigurationSource()
+        val config = CorsConfiguration()
+
+        val origins = listOf("http://localhost:3000", "http://localhost")
+
+        config.allowCredentials = true
+
+        for (origin in origins) {
+            config.addAllowedOrigin(origin)
+        }
+
+        config.addAllowedHeader("*")
+        config.addAllowedMethod("*")
+
+        source.registerCorsConfiguration("/**", config)
+
+        return CorsFilter(source)
     }
 }

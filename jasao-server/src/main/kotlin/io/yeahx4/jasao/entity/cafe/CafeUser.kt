@@ -8,20 +8,11 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 
 @Entity
-data class Cafe(
+data class CafeUser(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long,
 
-    @Column(length = 20, nullable = false)
-    val identifier: String,
-
-    @Column(length = 20, nullable = false)
-    var name: String,
-
-    @Column(length = 200)
-    var description: String,
-
     @Column(nullable = false)
-    var owner: Long,
+    var permission: Long
 ): TimeEntity()

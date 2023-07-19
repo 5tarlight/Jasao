@@ -1,4 +1,4 @@
-package io.yeahx4.jasao.repository
+package io.yeahx4.jasao.repository.cafe
 
 import io.yeahx4.jasao.entity.cafe.Cafe
 import org.springframework.data.jpa.repository.JpaRepository

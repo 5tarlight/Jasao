@@ -5,11 +5,11 @@ export default function Logout() {
   useEffect(() => {
     const storage = getStorage();
 
-    if ((storage && storage.user && storage.user.login) || false) {
-      saveStorage({
-        ...storage,
-        user: undefined,
-      });
+    if ((storage && storage.login && storage.login.login) || false) {
+      storage.login = undefined;
+      storage.user = undefined;
+
+      saveStorage(storage);
     }
 
     window.location.replace("/");
