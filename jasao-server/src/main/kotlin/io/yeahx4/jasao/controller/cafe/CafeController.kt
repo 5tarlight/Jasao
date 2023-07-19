@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -125,5 +126,10 @@ class CafeController(
 
         this.logger.info("Successfully cafe ${cafe.id} updated by user ${user.id}")
         return Res(HttpResponse("Success", null), HttpStatus.OK)
+    }
+
+    @GetMapping("/setting")
+    fun getCafeSetting(@RequestParam cafe: Long) {
+
     }
 }

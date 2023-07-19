@@ -13,7 +13,7 @@ export default function Header() {
 
   useEffect(() => {
     const storage = getStorage();
-    setLogin((storage && storage.user && storage.user.login) || false);
+    setLogin((storage && storage.login && storage.login.login) || false);
   }, []);
 
   return (
