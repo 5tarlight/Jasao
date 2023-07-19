@@ -1,7 +1,7 @@
 package io.yeahx4.jasao.service.cafe
 
 import io.yeahx4.jasao.dto.cafe.CreateCafeDto
-import io.yeahx4.jasao.entity.User
+import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.entity.cafe.Cafe
 import io.yeahx4.jasao.repository.cafe.CafeRepository
 import io.yeahx4.jasao.util.unwrap

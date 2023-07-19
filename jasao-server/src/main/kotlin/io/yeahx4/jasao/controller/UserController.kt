@@ -4,11 +4,11 @@ import io.yeahx4.jasao.dto.LoginDto
 import io.yeahx4.jasao.dto.LoginResDto
 import io.yeahx4.jasao.dto.SignUpDto
 import io.yeahx4.jasao.dto.UpdateUserDto
-import io.yeahx4.jasao.entity.User
-import io.yeahx4.jasao.service.auth.JwtService
+import io.yeahx4.jasao.entity.user.User
+import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
 import io.yeahx4.jasao.role.UserRole
-import io.yeahx4.jasao.service.auth.UserService
+import io.yeahx4.jasao.service.user.UserService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.MessageHttpResponse
 import io.yeahx4.jasao.util.MsgRes
@@ -44,13 +44,15 @@ class UserController(
 
             MsgRes(MessageHttpResponse("Duplicated ${check.second}."), HttpStatus.BAD_REQUEST)
         } else {
-            this.userService.saveUser(User(
+            this.userService.saveUser(
+                User(
                 -1,
                 dto.email,
                 dto.username,
                 this.userService.encrypt(dto.password),
                 UserRole.USER
-            ))
+            )
+            )
 
             logger.info("New user created: ${dto.username}")
 

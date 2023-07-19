@@ -1,6 +1,7 @@
-package io.yeahx4.jasao.entity
+package io.yeahx4.jasao.entity.user
 
 import io.yeahx4.jasao.dto.UserDto
+import io.yeahx4.jasao.entity.TimeEntity
 import io.yeahx4.jasao.role.UserRole
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
