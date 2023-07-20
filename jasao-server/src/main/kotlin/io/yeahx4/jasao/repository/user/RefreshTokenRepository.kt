@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface RefreshTokenRepository: JpaRepository<RefreshToken, String> {
     fun findByRefresh(refresh: String): RefreshToken?
+    fun findByJwt(jwt: String): RefreshToken?
 }

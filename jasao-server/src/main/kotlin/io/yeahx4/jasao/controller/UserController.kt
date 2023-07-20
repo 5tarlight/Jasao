@@ -8,15 +8,21 @@ import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
 import io.yeahx4.jasao.role.UserRole
+import io.yeahx4.jasao.service.UuidService
+import io.yeahx4.jasao.service.user.RefreshTokenService
 import io.yeahx4.jasao.service.user.UserService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.MessageHttpResponse
 import io.yeahx4.jasao.util.MsgRes
 import io.yeahx4.jasao.util.Res
 import io.yeahx4.jasao.util.isEmail
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseCookie
+import org.springframework.web.bind.annotation.CookieValue
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -29,7 +35,9 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val userService: UserService,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    private val uuidService: UuidService,
+    private val refreshTokenService: RefreshTokenService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -46,12 +54,12 @@ class UserController(
         } else {
             this.userService.saveUser(
                 User(
-                -1,
-                dto.email,
-                dto.username,
-                this.userService.encrypt(dto.password),
-                UserRole.USER
-            )
+                    -1,
+                    dto.email,
+                    dto.username,
+                    this.userService.encrypt(dto.password),
+                    UserRole.USER
+                )
             )
 
             logger.info("New user created: ${dto.username}")
@@ -61,7 +69,7 @@ class UserController(
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody dto: LoginDto): Res<LoginResDto> {
+    fun login(@RequestBody dto: LoginDto, response: HttpServletResponse): Res<LoginResDto> {
         if (!isEmail(dto.email))
             return Res(HttpResponse("Invalid format of email", null), HttpStatus.BAD_REQUEST)
 
@@ -79,16 +87,27 @@ class UserController(
             return Res(HttpResponse("Invalid credentials.", null), HttpStatus.NOT_FOUND)
         }
 
+        var refreshToken: String
+        do {
+            refreshToken = uuidService.createUuid()
+        } while (this.refreshTokenService.isRefreshTokenDuplicated(refreshToken))
+
+        val cookie = ResponseCookie.from("refreshToken")
+            .maxAge(7 * 24 * 60 * 60)
+            .path("/")
+            .sameSite("None")
+            .httpOnly(true)
+            .value(refreshToken)
+            .build()
+        response.setHeader("Set-Cookie", cookie.toString())
+
         val token = jwtTokenProvider.createToken(user.getEmail())
-        logger.info("Log in successful: ${dto.email} $token")
+
+        this.refreshTokenService.saveRefreshToken(refreshToken, token)
+
+        logger.info("Log in successful: ${dto.email} refresh: $refreshToken")
         return Res(HttpResponse("Ok", user.toDto().toLoginRes(token)), HttpStatus.OK)
     }
-
-//    @PostMapping("/auth/test")
-//    fun test(@RequestHeader("Authorization") token: String): String {
-//        val user = jwtService.getUserFromToken(token)
-//        return "Welcome ${user.getRealUsername()}"
-//    }
 
     @Transactional
     @PatchMapping("/auth/update")
@@ -116,5 +135,10 @@ class UserController(
         }
 
         return Res(HttpResponse("Success", null), HttpStatus.OK)
+    }
+
+    @PostMapping("/refresh")
+    fun refresh(@CookieValue refreshToken: String?) {
+        println(refreshToken)
     }
 }
