@@ -1,6 +1,6 @@
 package io.yeahx4.jasao.service.user
 
-import io.yeahx4.jasao.dto.SignUpDto
+import io.yeahx4.jasao.dto.user.SignUpDto
 import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.repository.user.UserRepository
 import org.springframework.data.repository.findByIdOrNull

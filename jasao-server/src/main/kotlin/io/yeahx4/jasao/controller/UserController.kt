@@ -1,9 +1,10 @@
 package io.yeahx4.jasao.controller
 
-import io.yeahx4.jasao.dto.LoginDto
-import io.yeahx4.jasao.dto.LoginResDto
-import io.yeahx4.jasao.dto.SignUpDto
-import io.yeahx4.jasao.dto.UpdateUserDto
+import io.yeahx4.jasao.dto.user.LoginDto
+import io.yeahx4.jasao.dto.user.LoginResDto
+import io.yeahx4.jasao.dto.user.RefreshResDto
+import io.yeahx4.jasao.dto.user.SignUpDto
+import io.yeahx4.jasao.dto.user.UpdateUserDto
 import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseCookie
 import org.springframework.web.bind.annotation.CookieValue
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -138,7 +138,40 @@ class UserController(
     }
 
     @PostMapping("/refresh")
-    fun refresh(@CookieValue refreshToken: String?) {
-        println(refreshToken)
+    fun refresh(
+        @CookieValue refreshToken: String?,
+        @RequestHeader("Authorization") token: String?
+    ): Res<RefreshResDto> {
+        if (refreshToken == null) {
+            this.logger.warn("Refresh token was not provided.")
+            return Res(HttpResponse("Login First", null), HttpStatus.BAD_REQUEST)
+        }
+
+        if (token == null) {
+            this.logger.warn("JWT refresh request denied: Login First. refresh: $refreshToken")
+            return Res(HttpResponse("Login First", null), HttpStatus.BAD_REQUEST)
+        }
+
+        val byRefresh = this.refreshTokenService.findByRefresh(refreshToken)
+        val pair = this.refreshTokenService.findRefreshJwtPair(refreshToken, token)
+
+        if (byRefresh == null) {
+            this.logger.warn("Unknown refresh token: $refreshToken")
+            return Res(HttpResponse("Invalid Access", null), HttpStatus.BAD_REQUEST)
+        } else if (pair == null) {
+            this.logger.warn("Suspicious refresh request: $refreshToken")
+            // TODO : Do protective process
+            return Res(HttpResponse("Suspicious Access", null), HttpStatus.FORBIDDEN)
+        }
+
+        // This will throw exception if JWT token expired.
+        val user = this.jwtService.getUserFromToken(token)
+        val newToken = this.jwtTokenProvider.createToken(user.getEmail())
+
+        // TODO : Save new JWT token to DB
+
+        this.logger.info("Successful JWT token refresh: refresh $refreshToken")
+
+        return Res(HttpResponse("Ok", RefreshResDto(newToken)), HttpStatus.OK)
     }
 }

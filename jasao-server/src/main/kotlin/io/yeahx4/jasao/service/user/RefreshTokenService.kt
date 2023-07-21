@@ -15,4 +15,12 @@ class RefreshTokenService(private val refreshTokenRepository: RefreshTokenReposi
             RefreshToken("", refresh, jwt)
         )
     }
+
+    fun findByRefresh(refresh: String): RefreshToken? {
+        return this.refreshTokenRepository.findByRefresh(refresh)
+    }
+
+    fun findRefreshJwtPair(refresh: String, jwt: String): RefreshToken? {
+        return this.refreshTokenRepository.findByRefreshAndJwt(refresh, jwt)
+    }
 }

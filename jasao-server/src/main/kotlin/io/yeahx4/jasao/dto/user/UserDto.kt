@@ -1,4 +1,4 @@
-package io.yeahx4.jasao.dto
+package io.yeahx4.jasao.dto.user
 
 import io.yeahx4.jasao.role.UserRole
 
@@ -42,4 +42,8 @@ data class UpdateUserDto(
     val username: String?,
     val password: String?,
     val oldPassword: String
+)
+
+data class RefreshResDto(
+    val token: String
 )
