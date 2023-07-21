@@ -3,8 +3,8 @@ package io.yeahx4.jasao.controller.cafe
 import io.yeahx4.jasao.dto.cafe.CreateCafeDto
 import io.yeahx4.jasao.dto.cafe.UpdateCafeDto
 import io.yeahx4.jasao.entity.cafe.Cafe
-import io.yeahx4.jasao.service.auth.JwtService
-import io.yeahx4.jasao.service.auth.UserService
+import io.yeahx4.jasao.service.user.JwtService
+import io.yeahx4.jasao.service.user.UserService
 import io.yeahx4.jasao.service.cafe.CafeService
 import io.yeahx4.jasao.service.cafe.CafeSettingService
 import io.yeahx4.jasao.util.HttpResponse

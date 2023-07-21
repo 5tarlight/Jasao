@@ -1,8 +1,8 @@
-package io.yeahx4.jasao.service.auth
+package io.yeahx4.jasao.service.user
 
-import io.yeahx4.jasao.dto.SignUpDto
-import io.yeahx4.jasao.entity.User
-import io.yeahx4.jasao.repository.UserRepository
+import io.yeahx4.jasao.dto.user.SignUpDto
+import io.yeahx4.jasao.entity.user.User
+import io.yeahx4.jasao.repository.user.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
