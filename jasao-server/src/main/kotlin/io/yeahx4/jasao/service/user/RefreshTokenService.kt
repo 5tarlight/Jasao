@@ -10,9 +10,9 @@ class RefreshTokenService(private val refreshTokenRepository: RefreshTokenReposi
         return this.refreshTokenRepository.findByRefresh(token) != null
     }
 
-    fun saveRefreshToken(refresh: String, jwt: String) {
+    fun saveRefreshToken(refresh: String, jwt: String, user: Long) {
         this.refreshTokenRepository.save(
-            RefreshToken("", refresh, jwt)
+            RefreshToken("", refresh, jwt, user, false)
         )
     }
 

@@ -103,7 +103,7 @@ class UserController(
 
         val token = jwtTokenProvider.createToken(user.getEmail())
 
-        this.refreshTokenService.saveRefreshToken(refreshToken, token)
+        this.refreshTokenService.saveRefreshToken(refreshToken, token, user.id)
 
         logger.info("Log in successful: ${dto.email} refresh: $refreshToken")
         return Res(HttpResponse("Ok", user.toDto().toLoginRes(token)), HttpStatus.OK)
@@ -138,9 +138,11 @@ class UserController(
     }
 
     @PostMapping("/refresh")
+    @Transactional
     fun refresh(
         @CookieValue refreshToken: String?,
-        @RequestHeader("Authorization") token: String?
+        @RequestHeader("Authorization") token: String?,
+        response: HttpServletResponse
     ): Res<RefreshResDto> {
         if (refreshToken == null) {
             this.logger.warn("Refresh token was not provided.")
@@ -165,10 +167,26 @@ class UserController(
         }
 
         // This will throw exception if JWT token expired.
-        val user = this.jwtService.getUserFromToken(token)
+        val user = this.userService.getUserById(byRefresh.user)
+
+        if (user == null) {
+            // This must not happen
+            this.logger.warn("Unknown user refresh token: user ${byRefresh.user} refresh $refreshToken")
+            return Res(HttpResponse("Unknown User", null), HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+
         val newToken = this.jwtTokenProvider.createToken(user.getEmail())
 
-        // TODO : Save new JWT token to DB
+        byRefresh.jwt = newToken
+
+        val cookie = ResponseCookie.from("refreshToken")
+            .maxAge(7 * 24 * 60 * 60)
+            .path("/")
+            .sameSite("None")
+            .httpOnly(true)
+            .value(refreshToken)
+            .build()
+        response.setHeader("Set-Cookie", cookie.toString())
 
         this.logger.info("Successful JWT token refresh: refresh $refreshToken")
 
