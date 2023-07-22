@@ -160,7 +160,8 @@ class UserController(
         if (byRefresh == null) {
             this.logger.warn("Unknown refresh token: $refreshToken")
             return Res(HttpResponse("Invalid Access", null), HttpStatus.BAD_REQUEST)
-        } else if (pair == null) {
+        }
+        if (pair == null) {
             this.logger.warn("Suspicious refresh request: $refreshToken")
             // TODO : Do protective process
             return Res(HttpResponse("Suspicious Access", null), HttpStatus.FORBIDDEN)
