@@ -1,5 +1,6 @@
 package io.yeahx4.jasao.entity.user
 
+import io.yeahx4.jasao.entity.TimeEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -12,9 +13,15 @@ data class RefreshToken(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String,
 
-    @Column
+    @Column(nullable = false)
     val refresh: String,
 
     @Column
-    var jwt: String
-)
+    var jwt: String,
+
+    @Column(nullable = false)
+    val user: Long,
+
+    @Column(nullable = false)
+    var expired: Boolean
+): TimeEntity()
