@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseCookie
 import org.springframework.web.bind.annotation.CookieValue
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -163,17 +164,30 @@ class UserController(
         }
         if (pair == null) {
             this.logger.warn("Suspicious refresh request: $refreshToken")
-            // TODO : Do protective process
+            this.refreshTokenService.deleteAllByUser(byRefresh.user)
             return Res(HttpResponse("Suspicious Access", null), HttpStatus.FORBIDDEN)
         }
+        if (byRefresh.expired) {
+            this.logger.warn("Expired refresh request: $refreshToken")
 
-        // This will throw exception if JWT token expired.
+            // Remove http-only cookie
+            val cookie = ResponseCookie.from("refreshToken")
+                .maxAge(0)
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .build()
+            response.setHeader("Set-Cookie", cookie.toString())
+
+            return Res(HttpResponse("Expired Token", null), HttpStatus.BAD_REQUEST)
+        }
+
         val user = this.userService.getUserById(byRefresh.user)
 
         if (user == null) {
-            // This must not happen
+            // Refresh of deleted account
             this.logger.warn("Unknown user refresh token: user ${byRefresh.user} refresh $refreshToken")
-            return Res(HttpResponse("Unknown User", null), HttpStatus.INTERNAL_SERVER_ERROR)
+            return Res(HttpResponse("Unknown User", null), HttpStatus.BAD_REQUEST)
         }
 
         val newToken = this.jwtTokenProvider.createToken(user.getEmail())
@@ -192,5 +206,45 @@ class UserController(
         this.logger.info("Successful JWT token refresh: refresh $refreshToken")
 
         return Res(HttpResponse("Ok", RefreshResDto(newToken)), HttpStatus.OK)
+    }
+
+    @GetMapping("/auth/logout")
+    @Transactional
+    fun logout(
+        @CookieValue refreshToken: String?,
+        @RequestHeader("Authorization") jwt: String,
+        response: HttpServletResponse
+    ): Res<String> {
+        if (refreshToken == null) {
+            this.logger.warn("Logout without refresh token. jwt: $jwt")
+            return Res(HttpResponse("Login First", null), HttpStatus.FORBIDDEN)
+        }
+        val pair = this.refreshTokenService.findRefreshJwtPair(refreshToken, jwt)
+
+        if (pair == null) {
+            this.logger.warn("Invalid refresh and jwt pair: ($refreshToken, $jwt)")
+
+            val cookie = ResponseCookie.from("refreshToken")
+                .maxAge(0)
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .build()
+            response.setHeader("Set-Cookie", cookie.toString())
+
+            return Res(HttpResponse("Invalid Token", null), HttpStatus.BAD_REQUEST)
+        }
+
+        val cookie = ResponseCookie.from("refreshToken")
+            .maxAge(0)
+            .path("/")
+            .sameSite("None")
+            .httpOnly(true)
+            .build()
+        response.setHeader("Set-Cookie", cookie.toString())
+        this.refreshTokenService.deleteByRefresh(refreshToken)
+
+        this.logger.info("Successful logout user ${pair.user}")
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }

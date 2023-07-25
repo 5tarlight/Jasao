@@ -7,4 +7,6 @@ interface RefreshTokenRepository: JpaRepository<RefreshToken, String> {
     fun findByRefresh(refresh: String): RefreshToken?
     fun findByJwt(jwt: String): RefreshToken?
     fun findByRefreshAndJwt(refresh: String, jwt: String): RefreshToken?
+    fun deleteAllByUser(user: Long)
+    fun deleteByRefresh(refresh: String)
 }

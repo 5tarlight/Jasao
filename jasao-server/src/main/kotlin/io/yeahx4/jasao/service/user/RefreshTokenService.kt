@@ -23,4 +23,12 @@ class RefreshTokenService(private val refreshTokenRepository: RefreshTokenReposi
     fun findRefreshJwtPair(refresh: String, jwt: String): RefreshToken? {
         return this.refreshTokenRepository.findByRefreshAndJwt(refresh, jwt)
     }
+
+    fun deleteAllByUser(user: Long) {
+        this.refreshTokenRepository.deleteAllByUser(user)
+    }
+
+    fun deleteByRefresh(refresh: String) {
+        this.refreshTokenRepository.deleteByRefresh(refresh)
+    }
 }
