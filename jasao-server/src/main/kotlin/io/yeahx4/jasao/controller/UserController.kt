@@ -163,17 +163,30 @@ class UserController(
         }
         if (pair == null) {
             this.logger.warn("Suspicious refresh request: $refreshToken")
-            // TODO : Do protective process
+            this.refreshTokenService.deleteAllByUser(byRefresh.user)
             return Res(HttpResponse("Suspicious Access", null), HttpStatus.FORBIDDEN)
         }
+        if (byRefresh.expired) {
+            this.logger.warn("Expired refresh request: $refreshToken")
 
-        // This will throw exception if JWT token expired.
+            // Remove http-only cookie
+            val cookie = ResponseCookie.from("refreshToken")
+                .maxAge(0)
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .build()
+            response.setHeader("Set-Cookie", cookie.toString())
+
+            return Res(HttpResponse("Expired Token", null), HttpStatus.BAD_REQUEST)
+        }
+
         val user = this.userService.getUserById(byRefresh.user)
 
         if (user == null) {
-            // This must not happen
+            // Refresh of deleted account
             this.logger.warn("Unknown user refresh token: user ${byRefresh.user} refresh $refreshToken")
-            return Res(HttpResponse("Unknown User", null), HttpStatus.INTERNAL_SERVER_ERROR)
+            return Res(HttpResponse("Unknown User", null), HttpStatus.BAD_REQUEST)
         }
 
         val newToken = this.jwtTokenProvider.createToken(user.getEmail())
