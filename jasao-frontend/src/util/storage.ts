@@ -1,7 +1,6 @@
 export interface LoginMemory {
   login: boolean;
   jwt: string;
-  refresh: string; // NOT IMPLEMENTED
 }
 
 export interface UserMemory {

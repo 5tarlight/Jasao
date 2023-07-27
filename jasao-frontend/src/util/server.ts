@@ -1,7 +1,8 @@
 import axios from "axios";
 
 export const getServer = () => {
-  return `http://${window.location.host.split(":")[0]}:8080`;
+  // return `http://${window.location.host.split(":")[0]}:8080`;
+  return "https://jasao.kro.kr:8080";
 };
 
 export const request = <T>(
@@ -17,6 +18,7 @@ export const request = <T>(
           ...headers,
           "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
     case "post":
       return axios.post<T>(url, data, {
@@ -24,6 +26,7 @@ export const request = <T>(
           ...headers,
           "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
     case "delete":
       return axios.delete<T>(url, {
@@ -31,6 +34,7 @@ export const request = <T>(
           ...headers,
           "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
     case "patch":
       return axios.patch<T>(url, data, {
@@ -38,6 +42,7 @@ export const request = <T>(
           ...headers,
           "Content-Type": "application/json",
         },
+        withCredentials: true,
       });
     case "put":
       return axios.put<T>(url, data, {
