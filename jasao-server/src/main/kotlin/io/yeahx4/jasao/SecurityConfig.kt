@@ -23,7 +23,9 @@ class SecurityConfig(
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
             .addMapping("/**")
-            .allowedOriginPatterns("http[s]{0,1}:\\/\\/(localhost)(:[0-9]{1,5}){0,1}")
+//            .allowedOriginPatterns("http[s]{0,1}:\\/\\/(localhost)(:[0-9]{1,5}){0,1}")
+            .allowedOrigins("http://localhost:3000")
+            .allowCredentials(true)
     }
 
     @Bean
