@@ -85,3 +85,20 @@
     cursor: pointer;
   }
 }
+
+.profile-container {
+  display: flex;
+  max-width: 300px;
+  justify-content: center;
+  align-content: center;
+}
+
+.profile-username {
+  font-size: 1.5rem;
+  font-weight: bolder;
+  user-select: none;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
