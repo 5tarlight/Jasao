@@ -50,6 +50,9 @@ export default function SignUp() {
             onChange={(e) => {
               setEmail(e.target.value);
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSubmit();
+            }}
           />
           <input
             className={cx("input")}
@@ -58,6 +61,9 @@ export default function SignUp() {
             value={username}
             onChange={(e) => {
               setUsername(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSubmit();
             }}
           />
           <input
@@ -68,6 +74,9 @@ export default function SignUp() {
             onChange={(e) => {
               setPassword(e.target.value);
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSubmit();
+            }}
           />
           <input
             className={cx("input")}
@@ -76,6 +85,9 @@ export default function SignUp() {
             value={confirm}
             onChange={(e) => {
               setConfirm(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSubmit();
             }}
           />
           <div className={cx("error-msg")}>{warn}</div>

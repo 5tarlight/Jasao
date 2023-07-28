@@ -64,6 +64,9 @@ export default function Login() {
             onChange={(e) => {
               setEmail(e.target.value);
             }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
+            }}
           />
           <input
             className={cx("input")}
@@ -72,6 +75,9 @@ export default function Login() {
             value={password}
             onChange={(e) => {
               setPassword(e.target.value);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
             }}
           />
           <div className={cx("unable")}>
