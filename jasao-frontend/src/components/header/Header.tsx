@@ -3,7 +3,12 @@ import classNames from "classnames/bind";
 import HeaderInput from "./HeaderInput";
 import HeaderLogo from "./HeaderLogo";
 import { useEffect, useState } from "react";
-import { UserMemory, getStorage, saveStorage } from "../../util/storage";
+import {
+  Memory,
+  UserMemory,
+  getStorage,
+  saveStorage,
+} from "../../util/storage";
 import HeaderLogin from "./HeaderLogin";
 import axios from "axios";
 import { getServer } from "../../util/server";
@@ -23,13 +28,15 @@ export default function Header() {
   const [user, setUser] = useState<UserMemory>();
 
   useEffect(() => {
-    const storage = getStorage();
+    let storage = getStorage();
 
-    if (!storage) {
+    if (!storage || !storage.login?.login) {
       return;
     }
 
     const refresh = () => {
+      storage = getStorage() as Memory;
+
       axios
         .post<RefreshRes>(
           `${getServer()}/user/refresh`,
@@ -49,7 +56,7 @@ export default function Header() {
                 jwt: res.data.data.token,
                 login: true,
               },
-            });
+            } as Memory);
             setLogin(true);
             setUser(getStorage()?.user!!);
           } else {
