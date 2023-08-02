@@ -6,7 +6,6 @@ export default function Logout() {
   useEffect(() => {
     const storage = getStorage();
     if (!storage || !storage.login?.login) return;
-    console.dir(storage);
 
     request(
       "get",
