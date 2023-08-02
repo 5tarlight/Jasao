@@ -1,6 +1,6 @@
-package io.yeahx4.jasao.repository
+package io.yeahx4.jasao.repository.user
 
-import io.yeahx4.jasao.entity.User
+import io.yeahx4.jasao.entity.user.User
 import org.springframework.data.jpa.repository.JpaRepository
 
 interface UserRepository: JpaRepository<User, Long> {

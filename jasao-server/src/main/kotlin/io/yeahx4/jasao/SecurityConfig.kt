@@ -23,7 +23,9 @@ class SecurityConfig(
     override fun addCorsMappings(registry: CorsRegistry) {
         registry
             .addMapping("/**")
-            .allowedOriginPatterns("http[s]{0,1}:\\/\\/(localhost)(:[0-9]{1,5}){0,1}")
+//            .allowedOriginPatterns("http[s]{0,1}:\\/\\/(localhost)(:[0-9]{1,5}){0,1}")
+            .allowedOrigins("http://localhost:3000")
+            .allowCredentials(true)
     }
 
     @Bean
@@ -54,7 +56,14 @@ class SecurityConfig(
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration()
 
-        val origins = listOf("http://localhost:3000", "http://localhost")
+        val origins = listOf(
+            "http://localhost:3000",
+            "http://localhost",
+            "https://localhost:3000",
+            "https://localhost",
+            "https://jasao.kro.kr:3000",
+            "https://jasao.kro.kr"
+        )
 
         config.allowCredentials = true
 

@@ -1,6 +1,7 @@
-package io.yeahx4.jasao.entity
+package io.yeahx4.jasao.entity.user
 
-import io.yeahx4.jasao.dto.UserDto
+import io.yeahx4.jasao.dto.user.UserDto
+import io.yeahx4.jasao.entity.TimeEntity
 import io.yeahx4.jasao.role.UserRole
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
@@ -31,7 +32,7 @@ class User(
     @Column(nullable = false, length = 100)
     private var email: String = email
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 20)
     private var username :String = username
 
     @Column(nullable = false, length = 255)

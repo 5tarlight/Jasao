@@ -1,22 +1,29 @@
 package io.yeahx4.jasao.controller
 
-import io.yeahx4.jasao.dto.LoginDto
-import io.yeahx4.jasao.dto.LoginResDto
-import io.yeahx4.jasao.dto.SignUpDto
-import io.yeahx4.jasao.dto.UpdateUserDto
-import io.yeahx4.jasao.entity.User
-import io.yeahx4.jasao.service.auth.JwtService
+import io.yeahx4.jasao.dto.user.LoginDto
+import io.yeahx4.jasao.dto.user.LoginResDto
+import io.yeahx4.jasao.dto.user.RefreshResDto
+import io.yeahx4.jasao.dto.user.SignUpDto
+import io.yeahx4.jasao.dto.user.UpdateUserDto
+import io.yeahx4.jasao.entity.user.User
+import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
 import io.yeahx4.jasao.role.UserRole
-import io.yeahx4.jasao.service.auth.UserService
+import io.yeahx4.jasao.service.UuidService
+import io.yeahx4.jasao.service.user.RefreshTokenService
+import io.yeahx4.jasao.service.user.UserService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.MessageHttpResponse
 import io.yeahx4.jasao.util.MsgRes
 import io.yeahx4.jasao.util.Res
 import io.yeahx4.jasao.util.isEmail
+import jakarta.servlet.http.HttpServletResponse
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseCookie
+import org.springframework.web.bind.annotation.CookieValue
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -29,7 +36,9 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
     private val userService: UserService,
     private val jwtTokenProvider: JwtTokenProvider,
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    private val uuidService: UuidService,
+    private val refreshTokenService: RefreshTokenService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -44,13 +53,15 @@ class UserController(
 
             MsgRes(MessageHttpResponse("Duplicated ${check.second}."), HttpStatus.BAD_REQUEST)
         } else {
-            this.userService.saveUser(User(
-                -1,
-                dto.email,
-                dto.username,
-                this.userService.encrypt(dto.password),
-                UserRole.USER
-            ))
+            this.userService.saveUser(
+                User(
+                    -1,
+                    dto.email,
+                    dto.username,
+                    this.userService.encrypt(dto.password),
+                    UserRole.USER
+                )
+            )
 
             logger.info("New user created: ${dto.username}")
 
@@ -59,7 +70,7 @@ class UserController(
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody dto: LoginDto): Res<LoginResDto> {
+    fun login(@RequestBody dto: LoginDto, response: HttpServletResponse): Res<LoginResDto> {
         if (!isEmail(dto.email))
             return Res(HttpResponse("Invalid format of email", null), HttpStatus.BAD_REQUEST)
 
@@ -77,16 +88,28 @@ class UserController(
             return Res(HttpResponse("Invalid credentials.", null), HttpStatus.NOT_FOUND)
         }
 
+        var refreshToken: String
+        do {
+            refreshToken = uuidService.createUuid()
+        } while (this.refreshTokenService.isRefreshTokenDuplicated(refreshToken))
+
+        val cookie = ResponseCookie.from("refreshToken")
+            .maxAge(7 * 24 * 60 * 60)
+            .path("/")
+            .sameSite("None")
+            .httpOnly(true)
+            .secure(true)
+            .value(refreshToken)
+            .build()
+        response.setHeader("Set-Cookie", cookie.toString())
+
         val token = jwtTokenProvider.createToken(user.getEmail())
-        logger.info("Log in successful: ${dto.email} $token")
+
+        this.refreshTokenService.saveRefreshToken(refreshToken, token, user.id)
+
+        logger.info("Log in successful: ${dto.email} refresh: $refreshToken")
         return Res(HttpResponse("Ok", user.toDto().toLoginRes(token)), HttpStatus.OK)
     }
-
-//    @PostMapping("/auth/test")
-//    fun test(@RequestHeader("Authorization") token: String): String {
-//        val user = jwtService.getUserFromToken(token)
-//        return "Welcome ${user.getRealUsername()}"
-//    }
 
     @Transactional
     @PatchMapping("/auth/update")
@@ -114,5 +137,120 @@ class UserController(
         }
 
         return Res(HttpResponse("Success", null), HttpStatus.OK)
+    }
+
+    @PostMapping("/refresh")
+    @Transactional
+    fun refresh(
+        @CookieValue refreshToken: String?,
+        @RequestHeader("Authorization") token: String?,
+        response: HttpServletResponse
+    ): Res<RefreshResDto> {
+        if (refreshToken == null) {
+            this.logger.warn("Refresh token was not provided.")
+            return Res(HttpResponse("Login First", null), HttpStatus.BAD_REQUEST)
+        }
+
+        if (token == null) {
+            this.logger.warn("JWT refresh request denied: Login First. refresh: $refreshToken")
+            return Res(HttpResponse("Login First", null), HttpStatus.BAD_REQUEST)
+        }
+
+        val byRefresh = this.refreshTokenService.findByRefresh(refreshToken)
+        val pair = this.refreshTokenService.findRefreshJwtPair(refreshToken, token)
+
+        if (byRefresh == null) {
+            this.logger.warn("Unknown refresh token: $refreshToken")
+            return Res(HttpResponse("Invalid Access", null), HttpStatus.BAD_REQUEST)
+        }
+        if (pair == null) {
+            this.logger.warn("Suspicious refresh request: $refreshToken")
+            this.refreshTokenService.deleteAllByUser(byRefresh.user)
+            return Res(HttpResponse("Suspicious Access", null), HttpStatus.FORBIDDEN)
+        }
+        if (byRefresh.expired) {
+            this.logger.warn("Expired refresh request: $refreshToken")
+
+            // Remove http-only cookie
+            val cookie = ResponseCookie.from("refreshToken")
+                .maxAge(0)
+                .path("/")
+                .sameSite("None")
+                .httpOnly(true)
+                .secure(true)
+                .build()
+            response.setHeader("Set-Cookie", cookie.toString())
+            this.refreshTokenService.deleteByRefresh(refreshToken)
+
+            return Res(HttpResponse("Expired Token", null), HttpStatus.BAD_REQUEST)
+        }
+
+        val user = this.userService.getUserById(byRefresh.user)
+
+        if (user == null) {
+            // Refresh of deleted account
+            this.logger.warn("Unknown user refresh token: user ${byRefresh.user} refresh $refreshToken")
+            return Res(HttpResponse("Unknown User", null), HttpStatus.BAD_REQUEST)
+        }
+
+        val newToken = this.jwtTokenProvider.createToken(user.getEmail())
+
+        byRefresh.jwt = newToken
+
+        val cookie = ResponseCookie.from("refreshToken")
+            .maxAge(7 * 24 * 60 * 60)
+            .path("/")
+            .sameSite("None")
+            .httpOnly(true)
+            .secure(true)
+            .value(refreshToken)
+            .build()
+        response.setHeader("Set-Cookie", cookie.toString())
+
+        this.logger.info("Successful JWT token refresh: refresh $refreshToken")
+
+        return Res(HttpResponse("Ok", RefreshResDto(newToken)), HttpStatus.OK)
+    }
+
+    @GetMapping("/auth/logout")
+    @Transactional
+    fun logout(
+        @CookieValue refreshToken: String?,
+        @RequestHeader("Authorization") jwt: String,
+        response: HttpServletResponse
+    ): Res<String> {
+        if (refreshToken == null) {
+            this.logger.warn("Logout without refresh token. jwt: $jwt")
+            return Res(HttpResponse("Login First", null), HttpStatus.FORBIDDEN)
+        }
+        val pair = this.refreshTokenService.findRefreshJwtPair(refreshToken, jwt)
+
+        if (pair == null) {
+            this.logger.warn("Invalid refresh and jwt pair: ($refreshToken, $jwt)")
+
+            val cookie = ResponseCookie.from("refreshToken")
+                .maxAge(0)
+                .path("/")
+                .sameSite("None")
+                .secure(true)
+                .httpOnly(true)
+                .build()
+            response.setHeader("Set-Cookie", cookie.toString())
+
+            return Res(HttpResponse("Invalid Token", null), HttpStatus.BAD_REQUEST)
+        }
+
+        val cookie = ResponseCookie.from("refreshToken")
+            .maxAge(0)
+            .path("/")
+            .sameSite("None")
+            .secure(true)
+            .httpOnly(true)
+            .build()
+        response.setHeader("Set-Cookie", cookie.toString())
+        this.refreshTokenService.deleteByRefresh(refreshToken)
+
+        this.logger.info("Successful logout user ${pair.user}")
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }
