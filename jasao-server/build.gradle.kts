@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "io.yeahx4"
-version = "0.0.1-SNAPSHOT"
+version = "alpha-1.0.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
