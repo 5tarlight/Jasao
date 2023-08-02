@@ -3,10 +3,16 @@ import classNames from "classnames/bind";
 import HeaderInput from "./HeaderInput";
 import HeaderLogo from "./HeaderLogo";
 import { useEffect, useState } from "react";
-import { getStorage, saveStorage } from "../../util/storage";
+import {
+  Memory,
+  UserMemory,
+  getStorage,
+  saveStorage,
+} from "../../util/storage";
 import HeaderLogin from "./HeaderLogin";
 import axios from "axios";
 import { getServer } from "../../util/server";
+import LoginHeader from "./LoginHeader";
 
 const cx = classNames.bind(styles);
 
@@ -19,53 +25,63 @@ interface RefreshRes {
 
 export default function Header() {
   const [login, setLogin] = useState(false);
+  const [user, setUser] = useState<UserMemory>();
 
   useEffect(() => {
-    const storage = getStorage();
+    let storage = getStorage();
 
-    if (!storage) {
+    if (!storage || !storage.login?.login) {
       return;
     }
 
-    axios
-      .post<RefreshRes>(
-        `${getServer()}/user/refresh`,
-        {},
-        {
-          headers: {
-            Authorization: storage.login?.jwt,
-          },
-          withCredentials: true,
-        }
-      )
-      .then((res) => {
-        if (res.data.data) {
-          saveStorage({
-            ...storage,
-            login: {
-              jwt: res.data.data.token,
-              login: true,
+    const refresh = () => {
+      storage = getStorage() as Memory;
+
+      axios
+        .post<RefreshRes>(
+          `${getServer()}/user/refresh`,
+          {},
+          {
+            headers: {
+              Authorization: storage.login?.jwt,
             },
-          });
-          setLogin(true);
-        } else {
+            withCredentials: true,
+          }
+        )
+        .then((res) => {
+          if (res.data.data) {
+            saveStorage({
+              ...storage,
+              login: {
+                jwt: res.data.data.token,
+                login: true,
+              },
+            } as Memory);
+            setLogin(true);
+            setUser(getStorage()?.user!!);
+          } else {
+            saveStorage({
+              ...storage,
+              login: undefined,
+              user: undefined,
+            });
+          }
+        })
+        .catch(() => {
+          setLogin(false);
           saveStorage({
             ...storage,
             login: undefined,
             user: undefined,
           });
-        }
-      })
-      .catch(() => {
-        setLogin(false);
-        saveStorage({
-          ...storage,
-          login: undefined,
-          user: undefined,
         });
-      });
+    };
 
-    // setLogin((storage && storage.login && storage.login.login) || false);
+    refresh();
+
+    const interval = setInterval(refresh, 20 * 60 * 1000); // 20m
+
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -77,7 +93,11 @@ export default function Header() {
         <div>
           <HeaderInput />
         </div>
-        {login ? <div>Welcome</div> : <HeaderLogin />}
+        {login ? (
+          <LoginHeader id={user?.id!!} username={user?.username!!} />
+        ) : (
+          <HeaderLogin />
+        )}
       </div>
     </header>
   );

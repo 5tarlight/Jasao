@@ -32,7 +32,7 @@ class User(
     @Column(nullable = false, length = 100)
     private var email: String = email
 
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 20)
     private var username :String = username
 
     @Column(nullable = false, length = 255)
