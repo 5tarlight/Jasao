@@ -97,8 +97,50 @@
   font-size: 1.5rem;
   font-weight: bolder;
   user-select: none;
+  text-align: right;
+  min-width: 200px;
 
   &:hover {
     cursor: pointer;
   }
+}
+
+.dropdown-container {
+  position: absolute;
+  border: 1px solid black;
+  border-radius: 5px;
+  width: 200px;
+  top: 60px;
+  display: none;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.dropdown-item {
+  line-height: 40px;
+  height: 40px;
+  font-size: 18px;
+  user-select: none;
+  padding-left: 7px;
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgb(241, 241, 241);
+  }
+}
+
+.dropdown-sep {
+  border-bottom: 1px solid black;
+}
+
+.dropdown-border {
+  border-bottom: 1px solid rgb(184, 184, 184);
+}
+
+.dropdown-accent {
+  color: red;
+}
+
+.dropdown-visible {
+  display: block; 
 }
