@@ -2,7 +2,7 @@ import axios from "axios";
 
 export const getServer = () => {
   // return `http://${window.location.host.split(":")[0]}:8080`;
-  return "https://jasao.kro.kr:8080";
+  return "https://ssky.kro.kr:8080";
 };
 
 export const request = <T>(
