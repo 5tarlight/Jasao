@@ -1,6 +1,7 @@
-import { FC } from "react";
+import { FC, useState, useRef } from "react";
 import styles from "../../styles/header/Header.module.scss";
 import classNames from "classnames/bind";
+import HeaderDropdown from "./HeaderDropdown";
 
 const cx = classNames.bind(styles);
 
@@ -10,11 +11,32 @@ interface Props {
 }
 
 const LoginHeader: FC<Props> = ({ id, username }) => {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+
   return (
-    <div className={cx("profile-container")}>
+    <div
+      ref={dropdownRef}
+      tabIndex={-1}
+      onClick={() => setDropdownVisible(!dropdownVisible)}
+      onBlur={(e) => {
+        if (!dropdownRef.current?.contains(e.relatedTarget)) {
+          setDropdownVisible(false);
+        }
+      }}
+      className={cx("profile-container")}
+    >
       <div className={cx("profile-username")}>
         {username.length > 20 ? username.slice(17) + "..." : username}
       </div>
+      <svg className={cx("triangle")}>
+        <polygon points="10,5 0,5 5,14" fill="black" />
+      </svg>
+      <HeaderDropdown
+        id={id}
+        visible={dropdownVisible}
+        setVisible={setDropdownVisible}
+      ></HeaderDropdown>
     </div>
   );
 };
