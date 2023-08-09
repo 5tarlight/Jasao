@@ -1,4 +1,4 @@
-import { FC, useEffect, useState, useRef } from "react";
+import { FC, useEffect, useState } from "react";
 import styles from "../../styles/header/Header.module.scss";
 import classNames from "classnames/bind";
 import HeaderDropdownItem from "./HeaderDropdownItem";
@@ -11,13 +11,13 @@ interface Props {
   setVisible: (value: boolean) => void;
 }
 
-interface Item {
+interface Button {
   text: string;
   to: string;
   accent?: boolean;
 }
 
-type DropdownItem = Item | "sep";
+type DropdownItem = Button | "sep";
 
 const HeaderDropdown: FC<Props> = ({ id, visible, setVisible }) => {
   const [renderItems, setRenderItems] = useState<JSX.Element>();
@@ -32,7 +32,7 @@ const HeaderDropdown: FC<Props> = ({ id, visible, setVisible }) => {
     { text: "Logout", to: "/auth/logout", accent: true },
   ];
 
-  const itemToRender = (key: number, item: DropdownItem, border: boolean) => {
+  const getElement = (key: number, item: DropdownItem, border: boolean) => {
     return item === "sep" ? (
       <hr key={key} className={cx("dropdown-sep")}></hr>
     ) : (
@@ -51,15 +51,11 @@ const HeaderDropdown: FC<Props> = ({ id, visible, setVisible }) => {
     setRenderItems(
       <>
         {items.map((item, i) =>
-          itemToRender(
-            i,
-            item,
-            items[i + 1] !== "sep" && items.length - 1 !== i
-          )
+          getElement(i, item, items[i + 1] !== "sep" && items.length - 1 !== i)
         )}
       </>
     );
-  }, []);
+  }, [items]);
 
   return (
     <div

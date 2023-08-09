@@ -91,6 +91,11 @@
   max-width: 300px;
   justify-content: center;
   align-content: center;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
 }
 
 .profile-username {
@@ -98,11 +103,7 @@
   font-weight: bolder;
   user-select: none;
   text-align: right;
-  min-width: 200px;
-
-  &:hover {
-    cursor: pointer;
-  }
+  min-width: 150px;
 }
 
 .dropdown-container {
@@ -114,6 +115,9 @@
   display: none;
   padding-top: 3px;
   padding-bottom: 3px;
+  background-color: white;
+  -webkit-box-shadow: 5px 5px 8px -1px rgba(0, 0, 0, 0.15);
+  box-shadow: 5px 5px 8px -1px rgba(0, 0, 0, 0.15);
 }
 
 .dropdown-item {
@@ -142,5 +146,11 @@
 }
 
 .dropdown-visible {
-  display: block; 
+  display: block;
+}
+
+.triangle {
+  width: 10px;
+  height: 14px;
+  margin-left: 7px;
 }

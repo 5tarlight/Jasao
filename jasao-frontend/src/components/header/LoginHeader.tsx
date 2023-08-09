@@ -2,7 +2,6 @@ import { FC, useState, useRef } from "react";
 import styles from "../../styles/header/Header.module.scss";
 import classNames from "classnames/bind";
 import HeaderDropdown from "./HeaderDropdown";
-import HeaderDropdownItem from "./HeaderDropdownItem";
 
 const cx = classNames.bind(styles);
 
@@ -19,6 +18,7 @@ const LoginHeader: FC<Props> = ({ id, username }) => {
     <div
       ref={dropdownRef}
       tabIndex={-1}
+      onClick={() => setDropdownVisible(!dropdownVisible)}
       onBlur={(e) => {
         if (!dropdownRef.current?.contains(e.relatedTarget)) {
           setDropdownVisible(false);
@@ -26,12 +26,12 @@ const LoginHeader: FC<Props> = ({ id, username }) => {
       }}
       className={cx("profile-container")}
     >
-      <div
-        className={cx("profile-username")}
-        onClick={() => setDropdownVisible(!dropdownVisible)}
-      >
+      <div className={cx("profile-username")}>
         {username.length > 20 ? username.slice(17) + "..." : username}
       </div>
+      <svg className={cx("triangle")}>
+        <polygon points="10,5 0,5 5,14" fill="black" />
+      </svg>
       <HeaderDropdown
         id={id}
         visible={dropdownVisible}
