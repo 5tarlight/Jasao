@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 @RestController
 @RequestMapping("/user")
@@ -252,5 +253,14 @@ class UserController(
 
         this.logger.info("Successful logout user ${pair.user}")
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
+    }
+
+    @PostMapping("/picture")
+    fun uploadPicture(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestBody file: MultipartFile
+    ): String {
+        val user = this.jwtService.getUserFromToken(jwt)
+        return this.userService.savePicture(user.id, file)
     }
 }
