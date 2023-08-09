@@ -42,6 +42,9 @@ class User(
     @Enumerated(EnumType.STRING)
     val role: UserRole = role
 
+    @Column(nullable = true)
+    val profile: String = ""
+
     fun toDto(): UserDto {
         return UserDto(
             this.id,
