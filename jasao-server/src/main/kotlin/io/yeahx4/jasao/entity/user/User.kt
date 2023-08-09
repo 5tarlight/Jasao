@@ -43,14 +43,19 @@ class User(
     val role: UserRole = role
 
     @Column(nullable = true)
-    val profile: String = ""
+    var profile: String = ""
+
+    @Column(nullable = false)
+    var bio: String = ""
 
     fun toDto(): UserDto {
         return UserDto(
             this.id,
             this.email,
             this.username,
-            this.role
+            this.role,
+            this.profile,
+            this.bio
         )
     }
 
