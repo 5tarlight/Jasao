@@ -1,4 +1,4 @@
-package io.yeahx4.jasao.controller
+package io.yeahx4.jasao.controller.user
 
 import io.yeahx4.jasao.dto.user.LoginDto
 import io.yeahx4.jasao.dto.user.LoginResDto
