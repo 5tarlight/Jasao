@@ -41,6 +41,7 @@ class SecurityConfig(
                 it
                     .requestMatchers("/user/auth/**").authenticated()
                     .requestMatchers("/cafe/auth/**").authenticated()
+                    .requestMatchers("/file/auth/**").authenticated()
                     .requestMatchers("/**").permitAll()
             }
             .addFilterBefore(
