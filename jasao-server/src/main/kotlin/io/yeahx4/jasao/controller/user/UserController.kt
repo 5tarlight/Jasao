@@ -9,7 +9,7 @@ import io.yeahx4.jasao.dto.user.UserDto
 import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
-import io.yeahx4.jasao.role.UserRole
+import io.yeahx4.jasao.role.user.UserRole
 import io.yeahx4.jasao.service.UuidService
 import io.yeahx4.jasao.service.user.RefreshTokenService
 import io.yeahx4.jasao.service.user.UserService
@@ -270,10 +270,7 @@ class UserController(
     @GetMapping("/id")
     fun getUserById(@RequestParam id: Long): Res<UserDto> {
         val user = this.userService.getUserById(id)
-
-        if (user == null) {
-            return Res(HttpResponse("Not Found", null), HttpStatus.NOT_FOUND)
-        }
+            ?: return Res(HttpResponse("Not Found", null), HttpStatus.NOT_FOUND)
 
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }

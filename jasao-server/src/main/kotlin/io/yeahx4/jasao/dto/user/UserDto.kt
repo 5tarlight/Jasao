@@ -1,6 +1,6 @@
 package io.yeahx4.jasao.dto.user
 
-import io.yeahx4.jasao.role.UserRole
+import io.yeahx4.jasao.role.user.UserRole
 
 data class SignUpDto(
     val email: String,
