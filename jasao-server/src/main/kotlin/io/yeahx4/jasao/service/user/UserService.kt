@@ -51,37 +51,4 @@ class UserService(
     fun getUserById(id: Long): User? {
         return this.userRepository.findByIdOrNull(id)
     }
-
-    fun savePicture(owner: Long, file: MultipartFile): String {
-        val path = arrayOf(
-            System.getProperty("user.dir"),
-            "..",
-            "cdn",
-            "public",
-            "images",
-            owner.toString()
-        ).joinToString(File.separator)
-        val targetPath = File(path)
-
-        if (!targetPath.exists()) {
-            targetPath.mkdirs()
-        }
-
-        if (file.isEmpty) {
-            return ""
-        }
-
-        val ext = if (file.contentType == "image/jpeg") {
-            ".jpg"
-        } else if (file.contentType == "image/png") {
-            ".png"
-        } else {
-            return ""
-        }
-
-        val target = File(targetPath, "profile${ext}")
-        file.transferTo(target)
-
-        return target.path
-    }
 }

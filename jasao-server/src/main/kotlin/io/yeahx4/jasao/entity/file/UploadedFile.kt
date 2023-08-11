@@ -12,11 +12,11 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 
 @Entity
-data class UploadedFIle(
+data class UploadedFile(
     @Id
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
-    val id: Long,
+    val id: String,
 
     @Column(nullable = false)
     val owner: Long,

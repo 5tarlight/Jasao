@@ -1,6 +1,6 @@
 package io.yeahx4.jasao.repository.file
 
-import io.yeahx4.jasao.entity.file.UploadedFIle
+import io.yeahx4.jasao.entity.file.UploadedFile
 import org.springframework.data.jpa.repository.JpaRepository
 
-interface UploadedFileRepository: JpaRepository<UploadedFIle, String>
+interface UploadedFileRepository: JpaRepository<UploadedFile, String>

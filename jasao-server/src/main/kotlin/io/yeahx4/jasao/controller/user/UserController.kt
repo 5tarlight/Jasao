@@ -257,15 +257,14 @@ class UserController(
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 
-    @PostMapping("/picture")
-    fun uploadPicture(
-        @RequestHeader("Authorization") jwt: String,
-        @RequestBody file: MultipartFile
-    ): String {
-        val user = this.jwtService.getUserFromToken(jwt)
-        return this.userService.savePicture(user.id, file)
-    }
-
+//    @PostMapping("/picture")
+//    fun uploadPicture(
+//        @RequestHeader("Authorization") jwt: String,
+//        @RequestBody file: MultipartFile
+//    ): String {
+//        val user = this.jwtService.getUserFromToken(jwt)
+//        return this.userService.savePicture(user.id, file)
+//    }
 
     @GetMapping("/id")
     fun getUserById(@RequestParam id: Long): Res<UserDto> {
