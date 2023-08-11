@@ -1,6 +1,6 @@
 package io.yeahx4.jasao.dto.user
 
-import io.yeahx4.jasao.role.UserRole
+import io.yeahx4.jasao.role.user.UserRole
 
 data class SignUpDto(
     val email: String,
@@ -17,7 +17,9 @@ data class UserDto(
     val id: Long,
     val email: String,
     val username: String,
-    val role: UserRole
+    val role: UserRole,
+    val profile: String,
+    val bio: String
 ) {
     fun toLoginRes(token: String): LoginResDto {
         return LoginResDto(
@@ -25,6 +27,7 @@ data class UserDto(
             email,
             username,
             role,
+            profile,
             token
         )
     }
@@ -35,6 +38,7 @@ data class LoginResDto(
     val email: String,
     val username: String,
     val role: UserRole,
+    val profile: String,
     val token: String
 )
 
