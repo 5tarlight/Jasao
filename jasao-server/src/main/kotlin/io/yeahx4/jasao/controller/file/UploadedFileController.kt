@@ -31,7 +31,6 @@ class UploadedFileController(
     fun uploadImage(
         @RequestHeader("Authorization") jwt: String,
         @RequestParam role: String,
-        @RequestParam type: String,
         @RequestBody file: MultipartFile
     ): Res<String> {
         val user = this.jwtService.getUserFromToken(jwt)

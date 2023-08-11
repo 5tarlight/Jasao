@@ -6,8 +6,6 @@ import io.yeahx4.jasao.repository.user.UserRepository
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
-import java.io.File
 
 @Service
 class UserService(

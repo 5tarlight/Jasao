@@ -31,7 +31,7 @@ const Test: FC = () => {
               formData.append("file", fileData);
 
               const res = await axios.post(
-                `${getServer()}/user/picture`,
+                `${getServer()}/file/auth/upload?role=profile`,
                 formData,
                 {
                   headers: {
