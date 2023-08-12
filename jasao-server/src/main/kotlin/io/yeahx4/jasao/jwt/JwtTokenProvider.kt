@@ -5,6 +5,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm.HS256
 import jakarta.annotation.PostConstruct
 import jakarta.servlet.http.HttpServletRequest
+import org.springframework.context.ApplicationContext
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -13,9 +14,12 @@ import java.util.Base64
 import java.util.Date
 
 @Component
-class JwtTokenProvider(private val userDetailsService: UserDetailsService) {
-    private var secret = "xvljkzviuwaeffljhasdfljknasvlxcvpipupiu" // TODO : This is for dev!
-    private val validTime = 30 * 60 * 1000L
+class JwtTokenProvider(
+    private val userDetailsService: UserDetailsService,
+    context: ApplicationContext
+) {
+    private var secret = context.environment.getProperty("jasao.jwt.secret")!!
+    private val validTime = context.environment.getProperty("jasao.jwt.lifetime")!!.toLong()
 
     // Encode secret with Base64 in constructor
     @PostConstruct
