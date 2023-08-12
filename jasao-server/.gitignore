@@ -40,3 +40,4 @@ logs
 .DS_Store
 
 keystore.p12
+jasao.properties
