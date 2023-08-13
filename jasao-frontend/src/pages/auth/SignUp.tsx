@@ -3,7 +3,7 @@ import styles from "../../styles/auth/auth.module.scss";
 import classNames from "classnames/bind";
 import { useState } from "react";
 import { getServer, request } from "../../util/server";
-import { emailRe, passwordRe, usernameRe, validate } from "../../util/auth";
+import { validate } from "../../util/auth";
 
 const cx = classNames.bind(styles);
 

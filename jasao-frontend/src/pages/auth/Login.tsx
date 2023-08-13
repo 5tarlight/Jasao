@@ -4,7 +4,7 @@ import classNames from "classnames/bind";
 import { useState } from "react";
 import { getServer, request } from "../../util/server";
 import { Memory, getStorage, saveStorage } from "../../util/storage";
-import { emailRe, passwordRe, validate } from "../../util/auth";
+import { validate } from "../../util/auth";
 
 const cx = classNames.bind(styles);
 
