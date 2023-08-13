@@ -26,6 +26,7 @@ interface RefreshRes {
 export default function Header() {
   const [login, setLogin] = useState(false);
   const [user, setUser] = useState<UserMemory>();
+  const [image, setImage] = useState<string | null>(null);
 
   useEffect(() => {
     let storage = getStorage();
@@ -66,6 +67,7 @@ export default function Header() {
               user: undefined,
             });
           }
+          setImage(storage?.user?.profile!!);
         })
         .catch(() => {
           setLogin(false);

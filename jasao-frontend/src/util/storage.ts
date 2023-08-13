@@ -6,7 +6,9 @@ export interface LoginMemory {
 export interface UserMemory {
   id: number;
   email: string;
+  profile: string;
   username: string;
+  bio: string;
   token: string;
   role: string;
 }

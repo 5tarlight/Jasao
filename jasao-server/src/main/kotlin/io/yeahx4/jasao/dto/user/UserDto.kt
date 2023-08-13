@@ -28,6 +28,7 @@ data class UserDto(
             username,
             role,
             profile,
+            bio,
             token
         )
     }
@@ -39,6 +40,7 @@ data class LoginResDto(
     val username: String,
     val role: UserRole,
     val profile: String,
+    val bio: String,
     val token: String
 )
 
