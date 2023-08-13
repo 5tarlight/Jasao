@@ -17,6 +17,8 @@ interface LoginRes {
         username: string;
         role: string;
         token: string;
+        profile: string;
+        bio: string;
       }
     | undefined;
 }
