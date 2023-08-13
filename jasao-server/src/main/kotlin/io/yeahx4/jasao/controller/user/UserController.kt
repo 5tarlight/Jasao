@@ -1,14 +1,15 @@
-package io.yeahx4.jasao.controller
+package io.yeahx4.jasao.controller.user
 
 import io.yeahx4.jasao.dto.user.LoginDto
 import io.yeahx4.jasao.dto.user.LoginResDto
 import io.yeahx4.jasao.dto.user.RefreshResDto
 import io.yeahx4.jasao.dto.user.SignUpDto
 import io.yeahx4.jasao.dto.user.UpdateUserDto
+import io.yeahx4.jasao.dto.user.UserDto
 import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
-import io.yeahx4.jasao.role.UserRole
+import io.yeahx4.jasao.role.user.UserRole
 import io.yeahx4.jasao.service.UuidService
 import io.yeahx4.jasao.service.user.RefreshTokenService
 import io.yeahx4.jasao.service.user.UserService
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -252,5 +254,29 @@ class UserController(
 
         this.logger.info("Successful logout user ${pair.user}")
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
+    }
+
+//    @PostMapping("/picture")
+//    fun uploadPicture(
+//        @RequestHeader("Authorization") jwt: String,
+//        @RequestBody file: MultipartFile
+//    ): String {
+//        val user = this.jwtService.getUserFromToken(jwt)
+//        return this.userService.savePicture(user.id, file)
+//    }
+
+    @GetMapping("/id")
+    fun getUserById(@RequestParam id: Long): Res<UserDto> {
+        val user = this.userService.getUserById(id)
+            ?: return Res(HttpResponse("Not Found", null), HttpStatus.NOT_FOUND)
+
+        return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
+    }
+
+    @GetMapping("/auth/me")
+    fun getMyProfile(@RequestHeader("Authorization") jwt: String): Res<UserDto> {
+        val user = this.jwtService.getUserFromToken(jwt)
+
+        return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
 }

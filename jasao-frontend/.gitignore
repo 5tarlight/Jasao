@@ -24,3 +24,5 @@ yarn-error.log*
 
 ssl/certificate.crt
 ssl/private.key
+
+.env

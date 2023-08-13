@@ -41,6 +41,7 @@ class SecurityConfig(
                 it
                     .requestMatchers("/user/auth/**").authenticated()
                     .requestMatchers("/cafe/auth/**").authenticated()
+                    .requestMatchers("/file/auth/**").authenticated()
                     .requestMatchers("/**").permitAll()
             }
             .addFilterBefore(
@@ -62,7 +63,9 @@ class SecurityConfig(
             "https://localhost:3000",
             "https://localhost",
             "https://jasao.kro.kr:3000",
-            "https://jasao.kro.kr"
+            "https://jasao.kro.kr",
+            "https://ssky.kro.kr:3000",
+            "https://ssky.kro.kr",
         )
 
         config.allowCredentials = true

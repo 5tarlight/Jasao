@@ -2,7 +2,7 @@ package io.yeahx4.jasao.entity.user
 
 import io.yeahx4.jasao.dto.user.UserDto
 import io.yeahx4.jasao.entity.TimeEntity
-import io.yeahx4.jasao.role.UserRole
+import io.yeahx4.jasao.role.user.UserRole
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -42,12 +42,20 @@ class User(
     @Enumerated(EnumType.STRING)
     val role: UserRole = role
 
+    @Column(nullable = true)
+    var profile: String = ""
+
+    @Column(nullable = false)
+    var bio: String = ""
+
     fun toDto(): UserDto {
         return UserDto(
             this.id,
             this.email,
             this.username,
-            this.role
+            this.role,
+            this.profile,
+            this.bio
         )
     }
 

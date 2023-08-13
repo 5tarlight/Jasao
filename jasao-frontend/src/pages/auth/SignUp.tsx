@@ -3,6 +3,7 @@ import styles from "../../styles/auth/auth.module.scss";
 import classNames from "classnames/bind";
 import { useState } from "react";
 import { getServer, request } from "../../util/server";
+import { validate } from "../../util/auth";
 
 const cx = classNames.bind(styles);
 
@@ -15,6 +16,10 @@ export default function SignUp() {
   const navigate = useNavigate();
 
   const handleSubmit = () => {
+    if (!validate("email", email, setWarn)) return;
+    if (!validate("username", username, setWarn)) return;
+    if (!validate("password", password, setWarn)) return;
+
     if (password !== confirm) {
       setWarn("비밀번호가 일치하지 않습니다.");
       return;

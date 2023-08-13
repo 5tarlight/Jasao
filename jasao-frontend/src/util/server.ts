@@ -2,7 +2,11 @@ import axios from "axios";
 
 export const getServer = () => {
   // return `http://${window.location.host.split(":")[0]}:8080`;
-  return "https://jasao.kro.kr:8080";
+  return process.env.REACT_APP_BACKEND;
+};
+
+export const getCdn = () => {
+  return process.env.REACT_APP_CDN_SERVER;
 };
 
 export const request = <T>(
