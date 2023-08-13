@@ -4,6 +4,7 @@ import classNames from "classnames/bind";
 import { useState } from "react";
 import { getServer, request } from "../../util/server";
 import { Memory, getStorage, saveStorage } from "../../util/storage";
+import { validate } from "../../util/auth";
 
 const cx = classNames.bind(styles);
 
@@ -26,6 +27,11 @@ export default function Login() {
   const [warn, setWarn] = useState("");
 
   const handleLogin = () => {
+    if (!validate("email", email) || !validate("password", password)) {
+      setWarn("로그인할 수 없습니다.");
+      return;
+    }
+
     request<LoginRes>("post", `${getServer()}/user/login`, { email, password })
       .then((res) => {
         const userData = res.data.data;
