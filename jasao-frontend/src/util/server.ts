@@ -5,6 +5,10 @@ export const getServer = () => {
   return process.env.REACT_APP_BACKEND;
 };
 
+export const getCdn = () => {
+  return process.env.REACT_APP_CDN_SERVER;
+};
+
 export const request = <T>(
   method: "get" | "post" | "patch" | "put" | "delete",
   url: string,
