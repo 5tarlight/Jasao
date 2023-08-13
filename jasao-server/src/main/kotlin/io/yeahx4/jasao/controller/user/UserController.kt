@@ -272,4 +272,11 @@ class UserController(
 
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
+
+    @GetMapping("/auth/me")
+    fun getMyProfile(@RequestHeader("Authorization") jwt: String): Res<UserDto> {
+        val user = this.jwtService.getUserFromToken(jwt)
+
+        return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
+    }
 }
