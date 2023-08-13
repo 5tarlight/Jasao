@@ -103,7 +103,13 @@
   font-weight: bolder;
   user-select: none;
   text-align: right;
-  min-width: 150px;
+  display: flex;
+  align-content: center;
+}
+
+.profile-username-text {
+  margin-left: 1rem;
+  margin-right: 0.5rem;
 }
 
 .dropdown-container {

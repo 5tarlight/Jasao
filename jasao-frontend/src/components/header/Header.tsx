@@ -11,8 +11,9 @@ import {
 } from "../../util/storage";
 import HeaderLogin from "./HeaderLogin";
 import axios from "axios";
-import { getServer } from "../../util/server";
+import { getServer, request } from "../../util/server";
 import LoginHeader from "./LoginHeader";
+import ProfileImage from "../ProfileImage";
 
 const cx = classNames.bind(styles);
 
@@ -21,6 +22,17 @@ interface RefreshRes {
   data: {
     token: string;
   } | null;
+}
+
+interface ProfileRes {
+  message: string;
+  data: {
+    id: number;
+    username: string;
+    email: string;
+    profile: string;
+    bio: string;
+  };
 }
 
 export default function Header() {
@@ -60,6 +72,17 @@ export default function Header() {
             } as Memory);
             setLogin(true);
             setUser(getStorage()?.user!!);
+
+            request<ProfileRes>(
+              "get",
+              `${getServer()}/user/auth/me`,
+              {},
+              {
+                Authorization: res.data.data.token,
+              }
+            ).then((res) => {
+              setImage(res.data.data.profile);
+            });
           } else {
             saveStorage({
               ...storage,
@@ -67,7 +90,8 @@ export default function Header() {
               user: undefined,
             });
           }
-          setImage(storage?.user?.profile!!);
+
+          // setImage(storage?.user?.profile!!);
         })
         .catch(() => {
           setLogin(false);
@@ -96,7 +120,11 @@ export default function Header() {
           <HeaderInput />
         </div>
         {login ? (
-          <LoginHeader id={user?.id!!} username={user?.username!!} />
+          <LoginHeader
+            id={user?.id!!}
+            username={user?.username!!}
+            image={image}
+          />
         ) : (
           <HeaderLogin />
         )}
