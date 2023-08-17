@@ -11,7 +11,7 @@ const Footer: FC<{}> = () => {
   return (
     <footer className={cx("footer")}>
       <div className={cx("footer-content")}>
-        <div>&copy; {year} Jasao All right reserved.</div>
+        <div>&copy; {year} Jasao All rights reserved.</div>
         <div className="footer-links">
           <Link to="/" className={cx("footer-link")}>
             About
