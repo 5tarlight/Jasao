@@ -19,6 +19,7 @@ const ProfileImage: FC<Props> = ({ image, size }) => {
           width={size}
           height={size}
           src={`${getCdn()}${image}`}
+          alt="Profile"
         ></img>
       ) : (
         <img
@@ -26,6 +27,7 @@ const ProfileImage: FC<Props> = ({ image, size }) => {
           width={size}
           height={size}
           src="/person.svg"
+          alt="Profile"
         ></img>
       )}
     </div>

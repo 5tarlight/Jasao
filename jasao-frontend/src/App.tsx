@@ -8,6 +8,7 @@ import Login from "./pages/auth/Login";
 import SignUp from "./pages/auth/SignUp";
 import Logout from "./pages/auth/Logout";
 import Test from "./pages/test";
+import Footer from "./components/footer/Footer";
 
 const cx = classNames.bind(styles);
 
@@ -28,6 +29,7 @@ function App() {
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </div>
+      <Footer />
     </BrowserRouter>
   );
 }
