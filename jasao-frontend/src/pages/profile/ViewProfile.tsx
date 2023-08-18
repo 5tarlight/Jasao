@@ -6,6 +6,7 @@ import UserInformation, {
   UserActionType,
 } from "../../components/profile/UserInformation";
 import { getServer, request } from "../../util/server";
+import { getStorage } from "../../util/storage";
 
 const cx = classNames.bind(styles);
 
@@ -25,6 +26,7 @@ const ViewProfile: FC = () => {
   const { id } = useParams();
   const nav = useNavigate();
   const [userData, setUserData] = useState<User>();
+  const [isMine, setIsMine] = useState<boolean>();
 
   const userAction = (type: UserActionType) => {
     switch (type) {
@@ -43,6 +45,9 @@ const ViewProfile: FC = () => {
   };
 
   useEffect(() => {
+    const storage = getStorage();
+    setIsMine(storage?.user?.id === id);
+
     request<User>("get", `${getServer()}/user/id?id=${id}`, {})
       .then((res) => {
         setUserData(res.data);
@@ -50,16 +55,16 @@ const ViewProfile: FC = () => {
       .catch((reason) => {
         nav("/404");
       });
-  }, []);
+  }, [id, nav]);
 
   return (
     <>
-      {userData ? (
+      {userData && isMine !== undefined ? (
         <div className={cx("contatiner")}>
           <div className={cx("info")}>
             <UserInformation
               user={userData}
-              isMine={false}
+              isMine={isMine}
               action={userAction}
             />
           </div>
