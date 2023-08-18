@@ -1,9 +1,13 @@
-import { FC } from "react";
+import { FC, useState } from "react";
 import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import ProfileImage from "../ProfileImage";
 import { User } from "../../pages/profile/ViewProfile";
 import EditableText from "../EditableText";
+import InputPopup from "../popup/Input";
+import { validate } from "../../util/auth";
+import { getStorage } from "../../util/storage";
+import { getServer, request } from "../../util/server";
 
 const cx = classNames.bind(styles);
 
@@ -16,7 +20,18 @@ interface Props {
 }
 
 const UserInformation: FC<Props> = ({ user, isMine, action }) => {
-  const edit = (value: string) => {};
+  const [popup, setPopup] = useState(false);
+  const [temp, setTemp] = useState("");
+  const [username, setUsername] = useState(user.data.username);
+
+  const edit = (value: string) => {
+    if (user.data.username === value) {
+      return;
+    }
+
+    setTemp(value);
+    setPopup(true);
+  };
 
   return (
     <div className={cx("info-container")}>
@@ -33,7 +48,8 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
         {/* <div className={cx("info-username")}>{user.data.username}</div> */}
         <EditableText
           className={cx("info-username")}
-          text={user.data.username}
+          value={username}
+          onChange={setUsername}
           onEdit={edit}
           editable={isMine}
           multiline
@@ -84,13 +100,40 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
           </>
         )}
       </div>
-      <div
-        className={cx("info-block")}
-        hidden={isMine}
-        onClick={() => action("block")}
-      >
-        차단
-      </div>
+      {!isMine ? (
+        <div className={cx("info-block")} onClick={() => action("block")}>
+          차단
+        </div>
+      ) : undefined}
+      <InputPopup
+        title="비밀번호를 입력하세요."
+        visible={popup}
+        setVisible={setPopup}
+        condition={(value) => validate("password", value)}
+        inputType="password"
+        onInput={(password) => {
+          const storage = getStorage();
+
+          request(
+            "patch",
+            `${getServer()}/user/auth/update`,
+            {
+              oldPassword: password,
+              username: temp,
+            },
+            {
+              Authorization: storage?.login?.jwt,
+            }
+          )
+            .then(() => {
+              user.data.username = temp;
+            })
+            .catch(() => {
+              window.confirm("닉네임 변경 오류");
+            });
+        }}
+        onCancel={() => setUsername(user.data.username)}
+      />
     </div>
   );
 };

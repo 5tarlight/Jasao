@@ -10,6 +10,8 @@ import Logout from "./pages/auth/Logout";
 import Test from "./pages/test";
 import Footer from "./components/footer/Footer";
 import ViewProfile from "./pages/profile/ViewProfile";
+import InputPopup from "./components/popup/Input";
+import { useState } from "react";
 
 const cx = classNames.bind(styles);
 
