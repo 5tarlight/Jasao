@@ -6,11 +6,12 @@
 
 .info {
   font-size: 0.9rem;
-  width: 17rem;
+  width: 27%;
   color: $text;
 }
 
 .content {
+  width: 73%;
 }
 
 .info-container {
@@ -31,9 +32,14 @@
   margin-bottom: 1rem;
 }
 
-.info-value-container {
+.info-value-container,
+.info-button-container {
   display: flex;
   justify-content: space-between;
+}
+
+.info-button-container-center {
+  justify-content: center;
 }
 
 .info-button {
@@ -56,11 +62,11 @@
 }
 
 .info-button-1 {
-  width: 70%;
+  width: 100%;
 }
 
 .info-button-2 {
-  width: 45%;
+  width: 47%;
 }
 
 .info-block {

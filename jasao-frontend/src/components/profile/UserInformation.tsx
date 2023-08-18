@@ -3,6 +3,7 @@ import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import ProfileImage from "../ProfileImage";
 import { User } from "../../pages/profile/ViewProfile";
+import EditableText from "../EditableText";
 
 const cx = classNames.bind(styles);
 
@@ -15,6 +16,8 @@ interface Props {
 }
 
 const UserInformation: FC<Props> = ({ user, isMine, action }) => {
+  const edit = (value: string) => {};
+
   return (
     <div className={cx("info-container")}>
       <ProfileImage
@@ -27,7 +30,14 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
         }}
       ></ProfileImage>
       <div className={cx("info-text-container")}>
-        <div className={cx("info-username")}>{user.data.username}</div>
+        {/* <div className={cx("info-username")}>{user.data.username}</div> */}
+        <EditableText
+          className={cx("info-username")}
+          text={user.data.username}
+          onEdit={edit}
+          editable={isMine}
+          multiline
+        />
         <div className={cx("info-value-container")}>
           <div>123 친구</div>
           <div>456 팔로잉</div>
@@ -42,28 +52,37 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
           <div>124 댓글</div>
         </div>
       </div>
-      <div className={cx("info-value-container")}>
-        <button
-          className={cx("info-button", "info-button-1")}
-          hidden={!isMine}
-          onClick={() => action("edit-profile")}
-        >
-          프로필 수정
-        </button>
-        <button
-          className={cx("info-button", "info-button-2")}
-          hidden={isMine}
-          onClick={() => action("follow")}
-        >
-          팔로우
-        </button>
-        <button
-          className={cx("info-button", "info-button-2")}
-          hidden={isMine}
-          onClick={() => action("add-friend")}
-        >
-          친구 추가
-        </button>
+      <div
+        className={cx("info-button-container", [
+          { "info-button-container-center": isMine },
+        ])}
+      >
+        {isMine ? (
+          <button
+            className={cx("info-button", "info-button-1")}
+            hidden={!isMine}
+            onClick={() => action("edit-profile")}
+          >
+            프로필 수정
+          </button>
+        ) : (
+          <>
+            <button
+              className={cx("info-button", "info-button-2")}
+              hidden={isMine}
+              onClick={() => action("follow")}
+            >
+              팔로우
+            </button>
+            <button
+              className={cx("info-button", "info-button-2")}
+              hidden={isMine}
+              onClick={() => action("add-friend")}
+            >
+              친구 추가
+            </button>
+          </>
+        )}
       </div>
       <div
         className={cx("info-block")}
