@@ -9,6 +9,7 @@ import SignUp from "./pages/auth/SignUp";
 import Logout from "./pages/auth/Logout";
 import Test from "./pages/test";
 import Footer from "./components/footer/Footer";
+import ViewProfile from "./pages/profile/ViewProfile";
 
 const cx = classNames.bind(styles);
 
@@ -23,6 +24,8 @@ function App() {
           <Route path="/auth/login" element={<Login />} />
           <Route path="/auth/signup" element={<SignUp />} />
           <Route path="/auth/logout" element={<Logout />} />
+
+          <Route path="/profile/:id" element={<ViewProfile />} />
 
           <Route path="/test" element={<Test />} />
 

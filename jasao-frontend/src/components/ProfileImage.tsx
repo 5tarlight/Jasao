@@ -6,30 +6,28 @@ import { getCdn } from "../util/server";
 const cx = classNames.bind(styles);
 
 interface Props {
-  image: string | null;
-  size: number;
+  image: string | null | undefined;
+  size: number | string;
+  style?: React.CSSProperties;
 }
 
-const ProfileImage: FC<Props> = ({ image, size }) => {
+const ProfileImage: FC<Props> = ({ image, size, style }) => {
+  const getImg = (src: string) => {
+    return (
+      <img
+        className={cx("image")}
+        width={size}
+        height={size}
+        src={src}
+        alt="Profile"
+        style={style}
+      ></img>
+    );
+  };
+
   return (
     <div className={cx("container")}>
-      {image ? (
-        <img
-          className={cx("image")}
-          width={size}
-          height={size}
-          src={`${getCdn()}${image}`}
-          alt="Profile"
-        ></img>
-      ) : (
-        <img
-          className={cx("image")}
-          width={size}
-          height={size}
-          src="/person.svg"
-          alt="Profile"
-        ></img>
-      )}
+      {image ? getImg(`${getCdn()}${image}`) : getImg("/person.svg")}
     </div>
   );
 };
