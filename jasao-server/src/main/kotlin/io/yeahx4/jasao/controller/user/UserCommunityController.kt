@@ -38,6 +38,9 @@ class UserCommunityController(
         if (user.id == dto.target) {
             return Res(HttpResponse("Self follow is prohibited", null), HttpStatus.BAD_REQUEST)
         }
+        if (this.followingService.isUserFollow(user.id, dto.target)) {
+            return Res(HttpResponse("Already following", null), HttpStatus.BAD_REQUEST)
+        }
 
         this.followingService.followUser(user.id, dto.target)
 

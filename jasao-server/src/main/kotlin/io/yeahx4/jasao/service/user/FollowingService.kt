@@ -23,4 +23,8 @@ class FollowingService(private val followingService: FollowingRepository) {
         return this.followingService.findAllByFollowed(target)
             .map { it.follower }
     }
+
+    fun isUserFollow(self: Long, target: Long): Boolean {
+        return this.followingService.existsByFollowerAndFollowed(self, target)
+    }
 }

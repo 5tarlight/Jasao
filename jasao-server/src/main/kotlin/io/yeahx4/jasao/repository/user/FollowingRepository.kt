@@ -7,4 +7,5 @@ interface FollowingRepository: JpaRepository<Following, String> {
     fun deleteByFollowerAndFollowed(follower: Long, followed: Long)
     fun findAllByFollower(follower: Long): List<Following>
     fun findAllByFollowed(followed: Long): List<Following>
+    fun existsByFollowerAndFollowed(follower: Long, followed: Long): Boolean
 }
