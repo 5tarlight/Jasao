@@ -13,4 +13,14 @@ class FollowingService(private val followingService: FollowingRepository) {
     fun unfollow(self: Long, target: Long) {
         this.followingService.deleteByFollowerAndFollowed(self, target)
     }
+
+    fun findByFollower(self: Long): List<Long> {
+        return this.followingService.findAllByFollower(self)
+            .map { it.followed }
+    }
+
+    fun findByFollowed(target: Long): List<Long> {
+        return this.followingService.findAllByFollowed(target)
+            .map { it.follower }
+    }
 }
