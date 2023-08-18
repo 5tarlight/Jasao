@@ -138,6 +138,11 @@ class UserController(
             tUser.setEncryptedPassword(this.userService.encrypt(dto.password))
         }
 
+        if (dto.bio != null) {
+            logger.info("Update user  ${user.getRealUsername()}(${user.id})'s bio")
+            tUser.bio = dto.bio
+        }
+
         return Res(HttpResponse("Success", null), HttpStatus.OK)
     }
 

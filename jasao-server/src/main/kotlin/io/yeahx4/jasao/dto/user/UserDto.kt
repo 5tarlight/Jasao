@@ -50,6 +50,7 @@ data class LoginResDto(
 data class UpdateUserDto(
     val username: String?,
     val password: String?,
+    val bio: String?,
     val oldPassword: String
 )
 
