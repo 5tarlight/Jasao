@@ -1,6 +1,5 @@
 package io.yeahx4.jasao.dto.user
 
-import io.yeahx4.jasao.entity.user.Following
 import io.yeahx4.jasao.role.user.UserRole
 
 data class SignUpDto(
@@ -21,8 +20,6 @@ data class UserDto(
     val role: UserRole,
     val profile: String,
     val bio: String,
-    val follower: List<Following>,
-    val followed: List<Following>,
 ) {
     fun toLoginRes(token: String): LoginResDto {
         return LoginResDto(

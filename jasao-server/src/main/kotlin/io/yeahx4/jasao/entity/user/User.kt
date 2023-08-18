@@ -1,5 +1,6 @@
 package io.yeahx4.jasao.entity.user
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.yeahx4.jasao.dto.user.UserDto
 import io.yeahx4.jasao.entity.TimeEntity
 import io.yeahx4.jasao.role.user.UserRole
@@ -51,22 +52,6 @@ class User(
     @Column(nullable = false)
     var bio: String = ""
 
-    @OneToMany(
-        cascade = [CascadeType.ALL],
-        mappedBy = "follower",
-        fetch = FetchType.EAGER,
-        orphanRemoval = true
-    )
-    val following: List<Following> = listOf()
-
-    @OneToMany(
-        cascade = [CascadeType.ALL],
-        mappedBy = "followed",
-        fetch = FetchType.EAGER,
-        orphanRemoval = true,
-    )
-    val followed: List<Following> = listOf()
-
     fun toDto(): UserDto {
         return UserDto(
             this.id,
@@ -75,8 +60,6 @@ class User(
             this.role,
             this.profile,
             this.bio,
-            this.following,
-            this.followed,
         )
     }
 

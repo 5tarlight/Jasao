@@ -1,13 +1,10 @@
 package io.yeahx4.jasao.entity.user
 
-import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToOne
 
 @Entity
 data class Following(
@@ -15,11 +12,9 @@ data class Following(
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String,
 
-    @ManyToOne(cascade = [CascadeType.REMOVE], fetch = FetchType.LAZY, targetEntity = User::class)
-    @JoinColumn
-    val follower: User,
+    @Column
+    val follower: Long,
 
-    @ManyToOne(cascade = [CascadeType.REMOVE], fetch = FetchType.LAZY, targetEntity = User::class)
-    @JoinColumn
-    val followed: User,
+    @Column
+    val followed: Long,
 )
