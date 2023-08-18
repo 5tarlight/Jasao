@@ -48,7 +48,13 @@ class UserCommunityController(
     fun unfollow(
         @RequestHeader("Authorization") jwt: String,
         @RequestBody dto: FollowDto
-    ) {
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt)
 
+        this.logger.info("User ${user.id} unfollows user ${dto.target}")
+
+        this.followingService.unfollow(user.id, dto.target)
+
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }
