@@ -138,6 +138,11 @@ class UserController(
             tUser.setEncryptedPassword(this.userService.encrypt(dto.password))
         }
 
+        if (dto.bio != null) {
+            logger.info("Update user  ${user.getRealUsername()}(${user.id})'s bio")
+            tUser.bio = dto.bio
+        }
+
         return Res(HttpResponse("Success", null), HttpStatus.OK)
     }
 
@@ -255,15 +260,6 @@ class UserController(
         this.logger.info("Successful logout user ${pair.user}")
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
-
-//    @PostMapping("/picture")
-//    fun uploadPicture(
-//        @RequestHeader("Authorization") jwt: String,
-//        @RequestBody file: MultipartFile
-//    ): String {
-//        val user = this.jwtService.getUserFromToken(jwt)
-//        return this.userService.savePicture(user.id, file)
-//    }
 
     @GetMapping("/id")
     fun getUserById(@RequestParam id: Long): Res<UserDto> {
