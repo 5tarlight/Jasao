@@ -73,7 +73,7 @@ const EditableText: FC<Props> = ({
         </div>
       ) : multiline ? (
         <textarea
-          className={`${className} ${editClassName}`}
+          className={`${cx("textarea")} ${className} ${editClassName}`}
           ref={textareaRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}
@@ -90,7 +90,7 @@ const EditableText: FC<Props> = ({
         ></textarea>
       ) : (
         <input
-          className={`${className} ${editClassName}`}
+          className={`${cx("input")} ${className} ${editClassName}`}
           ref={inputRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}

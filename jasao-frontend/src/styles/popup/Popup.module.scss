@@ -1,5 +1,17 @@
 @import "../Constant.scss";
 
+.popup-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
 @keyframes scale-up-center {
   0% {
     transform: scale(0.2);
@@ -11,19 +23,6 @@
   100% {
     transform: scale(1);
   }
-}
-
-.popup-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
 }
 
 .popup-box {
@@ -54,7 +53,6 @@
 
   padding: 0.5rem;
   border-radius: 4px;
-  margin-bottom: 0.7rem;
   width: 100%;
   outline: none;
   border: 1px solid black;
@@ -65,54 +63,69 @@
   }
 }
 
+.message {
+  word-wrap: break-word;
+  width: 100%;
+}
+
 .button-wrapper {
   display: flex;
   justify-content: space-evenly;
 
-  & button {
-    transition: background-color 0.07s cubic-bezier(0, 0, 1, 1);
+  margin-top: 1rem;
+}
 
-    padding: 7px 40px 7px 40px;
+.button {
+  transition: background-color 0.07s cubic-bezier(0, 0, 1, 1);
 
-    border-radius: 4px;
-    border: none;
-    outline: none;
-    user-select: none;
+  padding: 7px 40px 7px 40px;
 
-    &:hover {
-      background-color: $pri-light-hover;
-      cursor: pointer;
-    }
+  border-radius: 4px;
+  border: none;
+  outline: none;
+  user-select: none;
 
-    &:active {
-      background-color: $pri-light-active;
-    }
-
-    &:enabled {
-      background-color: $pri-light;
-    }
-
-    &:disabled {
-      background-color: rgb(221, 221, 221);
-    }
+  &:hover {
+    cursor: pointer;
   }
 
-  & .button-cancel {
-    &:hover {
-      background-color: $dim-hover;
-      cursor: pointer;
-    }
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
 
-    &:active {
-      background-color: $dim-active;
-    }
+.button-cancel {
+  &:hover {
+    background-color: $dim-hover;
+  }
 
-    &:enabled {
-      background-color: $dim;
-    }
+  &:active {
+    background-color: $dim-active;
+  }
 
-    &:disabled {
-      background-color: $text-light;
-    }
+  &:enabled {
+    background-color: $dim;
+  }
+
+  &:disabled {
+    background-color: $text-light;
+  }
+}
+
+.button-confirm {
+  &:hover {
+    background-color: $pri-light-hover;
+  }
+
+  &:active {
+    background-color: $pri-light-active;
+  }
+
+  &:enabled {
+    background-color: $pri-light;
+  }
+
+  &:disabled {
+    background-color: rgb(221, 221, 221);
   }
 }

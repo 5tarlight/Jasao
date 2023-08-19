@@ -8,22 +8,9 @@ import UserInformation, {
 import { getServer, request } from "../../util/server";
 import { getStorage } from "../../util/storage";
 import { isNumeric } from "../../util/utilities";
+import { User, UserRes } from "../../util/user";
 
 const cx = classNames.bind(styles);
-
-interface UserRes {
-  message: string;
-  data: User;
-}
-
-export interface User {
-  bio: string;
-  email: string;
-  id: number;
-  profile: string | null;
-  role: string;
-  username: string;
-}
 
 const ViewProfile: FC = () => {
   const { id } = useParams();
@@ -56,7 +43,7 @@ const ViewProfile: FC = () => {
       .then((res) => {
         setUserData(res.data.data);
       })
-      .catch((reason) => {
+      .catch(() => {
         nav("/404");
       });
   }, [id, nav]);

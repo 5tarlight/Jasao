@@ -3,11 +3,12 @@ import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import ProfileImage from "../ProfileImage";
 import EditableText from "../EditableText";
-import InputPopup from "../popup/Input";
+import Input from "../popup/Input";
 import { validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
 import { getServer, request } from "../../util/server";
 import { User } from "../../util/user";
+import Popup from "../popup/Popup";
 
 const cx = classNames.bind(styles);
 
@@ -86,7 +87,6 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
           onChange={setUsername}
           onEdit={edit}
           editable={isMine}
-          multiline
         />
         <div className={cx("info-value-container")}>
           <div>{friend} 친구</div>
@@ -139,34 +139,39 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
           차단
         </div>
       ) : undefined}
-      <InputPopup
+      <Popup
+        type="input"
         title="비밀번호를 입력하세요."
         visible={popup}
-        setVisible={setPopup}
-        condition={(value) => validate("password", value)}
+        onVisibleChange={setPopup}
+        confirmCondition={(value) => validate("password", value)}
         inputType="password"
-        onInput={(password) => {
-          const storage = getStorage();
+        onClose={(e) => {
+          if (e.button === "confirm") {
+            const storage = getStorage();
 
-          request(
-            "patch",
-            `${getServer()}/user/auth/update`,
-            {
-              oldPassword: password,
-              username: temp,
-            },
-            {
-              Authorization: storage?.login?.jwt,
-            }
-          )
-            .then(() => {
-              user.username = temp;
-            })
-            .catch(() => {
-              window.confirm("닉네임 변경 오류");
-            });
+            request(
+              "patch",
+              `${getServer()}/user/auth/update`,
+              {
+                oldPassword: e.value,
+                username: temp,
+              },
+              {
+                Authorization: storage?.login?.jwt,
+              }
+            )
+              .then(() => {
+                user.username = temp;
+              })
+              .catch(() => {
+                window.confirm("닉네임 변경 오류");
+                setUsername(user.username);
+              });
+          } else {
+            setUsername(user.username);
+          }
         }}
-        onCancel={() => setUsername(user.username)}
       />
     </div>
   );
