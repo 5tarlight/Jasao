@@ -1,5 +1,6 @@
 package io.yeahx4.jasao.entity.user
 
+import io.yeahx4.jasao.entity.TimeEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
@@ -17,4 +18,4 @@ data class Following(
 
     @Column
     val followed: Long,
-)
+): TimeEntity()
