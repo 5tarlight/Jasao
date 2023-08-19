@@ -1,0 +1,17 @@
+@import "./Constant.scss";
+
+* {
+  padding: 0;
+}
+
+textarea,
+input {
+  width: 100%;
+}
+
+textarea:focus,
+input:focus {
+  outline: $pri solid 1px;
+  border: none;
+  resize: none;
+}
