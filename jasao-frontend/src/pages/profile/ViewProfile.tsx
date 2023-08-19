@@ -11,16 +11,18 @@ import { isNumeric } from "../../util/utilities";
 
 const cx = classNames.bind(styles);
 
-export interface User {
+interface UserRes {
   message: string;
-  data: {
-    bio: string;
-    email: string;
-    id: number;
-    profile: string | null;
-    role: string;
-    username: string;
-  };
+  data: User;
+}
+
+export interface User {
+  bio: string;
+  email: string;
+  id: number;
+  profile: string | null;
+  role: string;
+  username: string;
 }
 
 const ViewProfile: FC = () => {
@@ -47,11 +49,12 @@ const ViewProfile: FC = () => {
 
   useEffect(() => {
     const storage = getStorage();
-    setIsMine(storage?.user?.id === isNumeric(id, -1));
+    const userId = isNumeric(id, -1);
+    setIsMine(storage?.user?.id === userId);
 
-    request<User>("get", `${getServer()}/user/id?id=${id}`, {})
+    request<UserRes>("get", `${getServer()}/user/id?id=${userId}`, {})
       .then((res) => {
-        setUserData(res.data);
+        setUserData(res.data.data);
       })
       .catch((reason) => {
         nav("/404");

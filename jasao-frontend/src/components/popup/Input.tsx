@@ -65,6 +65,7 @@ const InputPopup: FC<Props> = ({
         <div className={cx("title")}>{title}</div>
         <div className={cx("input")}>
           <input
+            className={cx("input")}
             ref={inputRef}
             value={value}
             type={inputType}
