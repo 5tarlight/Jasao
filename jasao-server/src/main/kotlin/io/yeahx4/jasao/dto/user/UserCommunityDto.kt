@@ -2,7 +2,6 @@ package io.yeahx4.jasao.dto.user
 
 import io.yeahx4.jasao.entity.user.User
 
-
 data class FollowDto(
     val target: Long
 )
