@@ -1,4 +1,5 @@
-import { requestWithLogin } from "./server";
+import { getServer, request, requestWithLogin } from "./server";
+import { getStorage } from "./storage";
 
 export type authType = "email" | "username" | "password";
 
@@ -64,16 +65,4 @@ export const validate = (
       break;
   }
   return true;
-};
-
-export const followUser = (targetId: number) => {
-  return requestWithLogin("post", "users/auth/follow", {
-    target: targetId,
-  });
-};
-
-export const unfollowUser = (targetId: number) => {
-  return requestWithLogin("post", "users/auth/unfollow", {
-    target: targetId,
-  });
 };

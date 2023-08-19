@@ -67,10 +67,11 @@ export const requestWithLogin = <T>(
 ) =>
   new Promise<T>((resolve, reject) => {
     const storage = getStorage();
+    console.log(storage);
 
     if (storage?.login?.login) {
       request<T>(method, `${getServer()}/${url}`, data, {
-        Authorization: storage.user?.token,
+        Authorization: storage?.user?.token,
         ...headers,
       })
         .then((res) => resolve(res.data))

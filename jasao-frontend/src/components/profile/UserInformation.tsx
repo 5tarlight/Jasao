@@ -3,7 +3,7 @@ import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import ProfileImage from "../ProfileImage";
 import EditableText from "../EditableText";
-import { followUser, unfollowUser, validate } from "../../util/auth";
+import { validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
 import { getServer, request } from "../../util/server";
 import { User } from "../../util/user";
@@ -47,21 +47,37 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
 
       case "follow":
         if (!isFollowed) {
-          followUser(user.id)
-            .then(() => {
-              refreshFollowList("followed");
-            })
-            .catch((reason) => window.confirm(`팔로우 실패 ${reason}`));
+          const storage = getStorage();
+          console.log(storage);
+
+          request(
+            "post",
+            `${getServer()}/users/auth/follow`,
+            { target: user.id },
+            {
+              Authorization: storage?.user?.token,
+            }
+          )
+            .then(() => refreshFollowList("followed"))
+            .catch((reason) => console.log(reason));
         }
         break;
 
       case "unfollow":
         if (isFollowed) {
-          unfollowUser(user.id)
-            .then(() => {
-              refreshFollowList("followed");
-            })
-            .catch((reason) => window.confirm(`언팔 실패 ${reason}`));
+          const storage = getStorage();
+          console.log(storage);
+
+          request(
+            "post",
+            `${getServer()}/users/auth/unfollow`,
+            { target: user.id },
+            {
+              Authorization: storage?.user?.token,
+            }
+          )
+            .then(() => refreshFollowList("followed"))
+            .catch((reason) => console.log(reason));
         }
         break;
 
