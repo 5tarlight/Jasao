@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getStorage } from "./storage";
 
 export const getServer = () => {
   // return `http://${window.location.host.split(":")[0]}:8080`;
@@ -57,3 +58,22 @@ export const request = <T>(
       });
   }
 };
+
+export const requestWithLogin = <T>(
+  method: "get" | "post" | "patch" | "put" | "delete",
+  url: string,
+  data?: any | undefined,
+  headers: any | undefined = undefined
+) =>
+  new Promise<T>((resolve, reject) => {
+    const storage = getStorage();
+
+    if (storage?.login?.login) {
+      request<T>(method, `${getServer()}/${url}`, data, {
+        Authorization: storage.user?.token,
+        ...headers,
+      })
+        .then((res) => resolve(res.data))
+        .catch(reject);
+    } else reject("required login");
+  });

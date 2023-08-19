@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef } from "react";
 import styles from "../../styles/popup/Popup.module.scss";
 import classNames from "classnames/bind";
 

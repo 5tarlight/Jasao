@@ -1,10 +1,9 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import ProfileImage from "../ProfileImage";
 import EditableText from "../EditableText";
-import Input from "../popup/Input";
-import { validate } from "../../util/auth";
+import { followUser, unfollowUser, validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
 import { getServer, request } from "../../util/server";
 import { User } from "../../util/user";
@@ -12,7 +11,7 @@ import Popup from "../popup/Popup";
 
 const cx = classNames.bind(styles);
 
-export type UserActionType =
+type UserActionType =
   | "edit-profile"
   | "follow"
   | "unfollow"
@@ -28,10 +27,11 @@ interface FollowRes {
 interface Props {
   user: User;
   isMine: boolean;
-  action: (type: UserActionType) => void;
+  myId: number | undefined;
+  // action: (type: UserActionType) => void;
 }
 
-const UserInformation: FC<Props> = ({ user, isMine, action }) => {
+const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
   const [popup, setPopup] = useState(false);
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.username);
@@ -41,13 +41,50 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
   const [following, setFollowing] = useState<number[]>([]);
   const [friend, setFriend] = useState(0);
 
-  useEffect(() => {
+  const action = (type: UserActionType) => {
+    switch (type) {
+      case "add-friend":
+        break;
+
+      case "follow":
+        if (!isFollowed) {
+          followUser(user.id)
+            .then(() => {
+              refreshFollowedList();
+            })
+            .catch((reason) => window.confirm(`팔로우 실패 ${reason}`));
+        }
+        break;
+
+      case "unfollow":
+        if (isFollowed) {
+          unfollowUser(user.id)
+            .then(() => {
+              refreshFollowedList();
+            })
+            .catch((reason) => window.confirm(`언팔 실패 ${reason}`));
+        }
+        break;
+
+      case "edit-profile":
+        break;
+
+      case "block":
+        break;
+    }
+  };
+
+  const refreshFollowedList = useCallback(() => {
     request<FollowRes>("get", `${getServer()}/users/followed?id=${user.id}`, {})
       .then((res) => {
         setFollowed(res.data.data);
       })
       .catch(() => console.log(`failed get followed: user/${user.id}`));
-  }, [setFollowed, user.id]);
+  }, [user.id]);
+
+  useEffect(() => {
+    refreshFollowedList();
+  }, [setFollowed, user.id, refreshFollowedList]);
 
   useEffect(() => {
     request<FollowRes>(
@@ -58,6 +95,10 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
       .then((res) => setFollowing(res.data.data))
       .catch(() => console.log(`failed get following: user/${user.id}`));
   }, [setFollowing, user.id]);
+
+  useEffect(() => {
+    if (myId) setIsFollowed(followed.includes(myId));
+  }, [followed, myId]);
 
   const edit = (value: string) => {
     if (user.username === value) {

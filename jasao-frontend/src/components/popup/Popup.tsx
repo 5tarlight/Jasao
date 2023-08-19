@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import styles from "../../styles/popup/Popup.module.scss";
 import classNames from "classnames/bind";
 import Input from "./Input";
@@ -81,9 +81,14 @@ const Popup: FC<Props> = ({
     }
   };
 
+  const checkCondition = useCallback(
+    () => confirmCondition(value),
+    [confirmCondition, value]
+  );
+
   useEffect(() => {
-    setBtnEnable(confirmCondition(value));
-  }, [value]);
+    setBtnEnable(checkCondition());
+  }, [value, checkCondition]);
 
   return visible ? (
     <div

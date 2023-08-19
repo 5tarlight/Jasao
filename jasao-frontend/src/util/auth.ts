@@ -1,3 +1,5 @@
+import { requestWithLogin } from "./server";
+
 export type authType = "email" | "username" | "password";
 
 export const emailRe = new RegExp("^[\\w]+@([\\w-\\.]+\\.)+[\\w]{2,4}$");
@@ -62,4 +64,16 @@ export const validate = (
       break;
   }
   return true;
+};
+
+export const followUser = (targetId: number) => {
+  return requestWithLogin("post", "users/auth/follow", {
+    target: targetId,
+  });
+};
+
+export const unfollowUser = (targetId: number) => {
+  return requestWithLogin("post", "users/auth/unfollow", {
+    target: targetId,
+  });
 };
