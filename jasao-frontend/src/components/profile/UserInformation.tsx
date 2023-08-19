@@ -28,7 +28,6 @@ interface Props {
   user: User;
   isMine: boolean;
   myId: number | undefined;
-  // action: (type: UserActionType) => void;
 }
 
 const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
@@ -50,7 +49,7 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
         if (!isFollowed) {
           followUser(user.id)
             .then(() => {
-              refreshFollowedList();
+              refreshFollowList("followed");
             })
             .catch((reason) => window.confirm(`팔로우 실패 ${reason}`));
         }
@@ -60,7 +59,7 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
         if (isFollowed) {
           unfollowUser(user.id)
             .then(() => {
-              refreshFollowedList();
+              refreshFollowList("followed");
             })
             .catch((reason) => window.confirm(`언팔 실패 ${reason}`));
         }
@@ -74,31 +73,33 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
     }
   };
 
-  const refreshFollowedList = useCallback(() => {
-    request<FollowRes>("get", `${getServer()}/users/followed?id=${user.id}`, {})
-      .then((res) => {
-        setFollowed(res.data.data);
-      })
-      .catch(() => console.log(`failed get followed: user/${user.id}`));
-  }, [user.id]);
+  const refreshFollowList = useCallback(
+    (type: "followed" | "following") => {
+      request<FollowRes>(
+        "get",
+        `${getServer()}/users/${type}?id=${user.id}`,
+        {}
+      )
+        .then((res) => {
+          if (type === "followed") setFollowed(res.data.data);
+          else setFollowing(res.data.data);
+        })
+        .catch(() => console.log(`failed get ${type}: user/${user.id}`));
+    },
+    [user.id]
+  );
 
   useEffect(() => {
-    refreshFollowedList();
-  }, [setFollowed, user.id, refreshFollowedList]);
-
-  useEffect(() => {
-    request<FollowRes>(
-      "get",
-      `${getServer()}/users/following?id=${user.id}`,
-      {}
-    )
-      .then((res) => setFollowing(res.data.data))
-      .catch(() => console.log(`failed get following: user/${user.id}`));
-  }, [setFollowing, user.id]);
+    refreshFollowList("followed");
+  }, [setFollowed, user.id, refreshFollowList]);
 
   useEffect(() => {
     if (myId) setIsFollowed(followed.includes(myId));
   }, [followed, myId]);
+
+  useEffect(() => {
+    setUsername(user.username);
+  }, [user]);
 
   const edit = (value: string) => {
     if (user.username === value) {
@@ -121,7 +122,6 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
         }}
       ></ProfileImage>
       <div className={cx("info-text-container")}>
-        {/* <div className={cx("info-username")}>{user.data.username}</div> */}
         <EditableText
           className={cx("info-username")}
           value={username}
