@@ -94,6 +94,10 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
   }, [setFollowed, user.id, refreshFollowList]);
 
   useEffect(() => {
+    refreshFollowList("following");
+  }, [setFollowing, user, refreshFollowList]);
+
+  useEffect(() => {
     if (myId) setIsFollowed(followed.includes(myId));
   }, [followed, myId]);
 
