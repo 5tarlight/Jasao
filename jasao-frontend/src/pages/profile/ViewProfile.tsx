@@ -7,7 +7,7 @@ import UserInformation, {
 } from "../../components/profile/UserInformation";
 import { getServer, request } from "../../util/server";
 import { getStorage } from "../../util/storage";
-import { checkNumber } from "../../util/utilities";
+import { isNumeric } from "../../util/utilities";
 
 const cx = classNames.bind(styles);
 
@@ -47,7 +47,7 @@ const ViewProfile: FC = () => {
 
   useEffect(() => {
     const storage = getStorage();
-    setIsMine(storage?.user?.id === checkNumber(id, -1));
+    setIsMine(storage?.user?.id === isNumeric(id, -1));
 
     request<User>("get", `${getServer()}/user/id?id=${id}`, {})
       .then((res) => {
