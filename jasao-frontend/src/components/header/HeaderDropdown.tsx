@@ -21,7 +21,7 @@ type DropdownItem = Button | "sep";
 
 const HeaderDropdown: FC<Props> = ({ id, visible, setVisible }) => {
   const items: DropdownItem[] = [
-    { text: "Profile", to: `/profile/${id}` },
+    { text: "Profile", to: `/user/${id}` },
     "sep",
     { text: "Joined cafes", to: "/" },
     { text: "Owned cafes", to: "/" },

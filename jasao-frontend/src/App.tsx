@@ -10,8 +10,6 @@ import Logout from "./pages/auth/Logout";
 import Test from "./pages/test";
 import Footer from "./components/footer/Footer";
 import ViewProfile from "./pages/profile/ViewProfile";
-import InputPopup from "./components/popup/Input";
-import { useState } from "react";
 
 const cx = classNames.bind(styles);
 
@@ -27,7 +25,7 @@ function App() {
           <Route path="/auth/signup" element={<SignUp />} />
           <Route path="/auth/logout" element={<Logout />} />
 
-          <Route path="/profile/:id" element={<ViewProfile />} />
+          <Route path="/user/:id" element={<ViewProfile />} />
 
           <Route path="/test" element={<Test />} />
 

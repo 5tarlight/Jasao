@@ -1,4 +1,4 @@
-import { FC, useState, useRef, useEffect } from "react";
+import { FC, useState, useRef, useEffect, useCallback } from "react";
 import styles from "../styles/EditableText.module.scss";
 import classNames from "classnames/bind";
 
@@ -41,26 +41,22 @@ const EditableText: FC<Props> = ({
     onEdit(value);
   };
 
-  const cancel = () => {
+  const cancel = useCallback(() => {
     if (multiline) textareaRef.current?.blur();
     else inputRef.current?.blur();
     onChange(temp);
     setIsEditing(false);
     setIsCancel(false);
-  };
+  }, [multiline, onChange, temp]);
 
   useEffect(() => {
     if (multiline) textareaRef.current?.focus();
     else inputRef.current?.focus();
-
-    // eslint-disable-next-line
-  }, [isEditing, setIsEditing]);
+  }, [isEditing, setIsEditing, multiline]);
 
   useEffect(() => {
     if (isCancel) cancel();
-
-    // eslint-disable-next-line
-  }, [isCancel]);
+  }, [isCancel, cancel]);
 
   return (
     <>

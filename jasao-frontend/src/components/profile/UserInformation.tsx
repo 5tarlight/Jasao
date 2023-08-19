@@ -11,7 +11,13 @@ import { getServer, request } from "../../util/server";
 
 const cx = classNames.bind(styles);
 
-export type UserActionType = "edit-profile" | "follow" | "add-friend" | "block";
+export type UserActionType =
+  | "edit-profile"
+  | "follow"
+  | "unfollow"
+  | "add-friend"
+  | "remove-friend"
+  | "block";
 
 interface Props {
   user: User;
@@ -23,6 +29,8 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
   const [popup, setPopup] = useState(false);
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.data.username);
+  const isFriend = false;
+  const isFollowed = false;
 
   const edit = (value: string) => {
     if (user.data.username === value) {
@@ -86,16 +94,16 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
             <button
               className={cx("info-button", "info-button-2")}
               hidden={isMine}
-              onClick={() => action("follow")}
+              onClick={() => action(isFollowed ? "unfollow" : "follow")}
             >
-              팔로우
+              {isFollowed ? "언팔로우" : "팔로우"}
             </button>
             <button
               className={cx("info-button", "info-button-2")}
               hidden={isMine}
-              onClick={() => action("add-friend")}
+              onClick={() => action(isFriend ? "remove-friend" : "add-friend")}
             >
-              친구 추가
+              {isFriend ? "친구 삭제" : "친구 추가"}
             </button>
           </>
         )}
