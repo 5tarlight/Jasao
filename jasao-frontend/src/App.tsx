@@ -10,6 +10,7 @@ import Logout from "./pages/auth/Logout";
 import Test from "./pages/test";
 import Footer from "./components/footer/Footer";
 import ViewProfile from "./pages/profile/ViewProfile";
+import PopupTest from "./pages/popupTest";
 
 const cx = classNames.bind(styles);
 
@@ -27,7 +28,8 @@ function App() {
 
           <Route path="/user/:id" element={<ViewProfile />} />
 
-          <Route path="/test" element={<Test />} />
+          <Route path="/test/upload" element={<Test />} />
+          <Route path="/test/popup" element={<PopupTest />} />
 
           <Route path="/*" element={<NotFound />} />
         </Routes>

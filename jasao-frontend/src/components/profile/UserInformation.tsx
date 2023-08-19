@@ -1,17 +1,17 @@
-import { FC, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import ProfileImage from "../ProfileImage";
-import { User } from "../../pages/profile/ViewProfile";
 import EditableText from "../EditableText";
-import InputPopup from "../popup/Input";
 import { validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
 import { getServer, request } from "../../util/server";
+import { User } from "../../util/user";
+import Popup from "../popup/Popup";
 
 const cx = classNames.bind(styles);
 
-export type UserActionType =
+type UserActionType =
   | "edit-profile"
   | "follow"
   | "unfollow"
@@ -19,21 +19,112 @@ export type UserActionType =
   | "remove-friend"
   | "block";
 
+interface FollowRes {
+  message: string;
+  data: number[];
+}
+
 interface Props {
   user: User;
   isMine: boolean;
-  action: (type: UserActionType) => void;
+  myId: number | undefined;
 }
 
-const UserInformation: FC<Props> = ({ user, isMine, action }) => {
+const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
   const [popup, setPopup] = useState(false);
   const [temp, setTemp] = useState("");
-  const [username, setUsername] = useState(user.data.username);
-  const isFriend = false;
-  const isFollowed = false;
+  const [username, setUsername] = useState(user.username);
+  const [isFriend, setIsFriend] = useState(false);
+  const [isFollowed, setIsFollowed] = useState(false);
+  const [followed, setFollowed] = useState<number[]>([]);
+  const [following, setFollowing] = useState<number[]>([]);
+  const [friend, setFriend] = useState(0);
+
+  console.log(getStorage());
+
+  const action = (type: UserActionType) => {
+    switch (type) {
+      case "add-friend":
+        break;
+
+      case "follow":
+        if (!isFollowed) {
+          const storage = getStorage();
+          console.log(storage);
+
+          request(
+            "post",
+            `${getServer()}/users/auth/follow`,
+            { target: user.id },
+            {
+              Authorization: storage?.login?.jwt,
+            }
+          )
+            .then(() => refreshFollowList("followed"))
+            .catch((reason) => console.log(reason));
+        }
+        break;
+
+      case "unfollow":
+        if (isFollowed) {
+          const storage = getStorage();
+          console.log(storage);
+
+          request(
+            "post",
+            `${getServer()}/users/auth/unfollow`,
+            { target: user.id },
+            {
+              Authorization: storage?.login?.jwt,
+            }
+          )
+            .then(() => refreshFollowList("followed"))
+            .catch((reason) => console.log(reason));
+        }
+        break;
+
+      case "edit-profile":
+        break;
+
+      case "block":
+        break;
+    }
+  };
+
+  const refreshFollowList = useCallback(
+    (type: "followed" | "following") => {
+      request<FollowRes>(
+        "get",
+        `${getServer()}/users/${type}?id=${user.id}`,
+        {}
+      )
+        .then((res) => {
+          if (type === "followed") setFollowed(res.data.data);
+          else setFollowing(res.data.data);
+        })
+        .catch(() => console.log(`failed get ${type}: user/${user.id}`));
+    },
+    [user.id]
+  );
+
+  useEffect(() => {
+    refreshFollowList("followed");
+  }, [setFollowed, user.id, refreshFollowList]);
+
+  useEffect(() => {
+    refreshFollowList("following");
+  }, [setFollowing, user, refreshFollowList]);
+
+  useEffect(() => {
+    if (myId) setIsFollowed(followed.includes(myId));
+  }, [followed, myId]);
+
+  useEffect(() => {
+    setUsername(user.username);
+  }, [user]);
 
   const edit = (value: string) => {
-    if (user.data.username === value) {
+    if (user.username === value) {
       return;
     }
 
@@ -44,7 +135,7 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
   return (
     <div className={cx("info-container")}>
       <ProfileImage
-        image={user.data.profile}
+        image={user.profile}
         size={16.5 * 16}
         style={{
           borderWidth: 2,
@@ -53,19 +144,17 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
         }}
       ></ProfileImage>
       <div className={cx("info-text-container")}>
-        {/* <div className={cx("info-username")}>{user.data.username}</div> */}
         <EditableText
           className={cx("info-username")}
           value={username}
           onChange={setUsername}
           onEdit={edit}
           editable={isMine}
-          multiline
         />
         <div className={cx("info-value-container")}>
-          <div>123 친구</div>
-          <div>456 팔로잉</div>
-          <div>789 팔로워</div>
+          <div>{friend} 친구</div>
+          <div>{following.length} 팔로잉</div>
+          <div>{followed.length} 팔로워</div>
         </div>
         <div className={cx("info-value-container")}>
           <div>124 카페 가입</div>
@@ -113,34 +202,39 @@ const UserInformation: FC<Props> = ({ user, isMine, action }) => {
           차단
         </div>
       ) : undefined}
-      <InputPopup
+      <Popup
+        type="input"
         title="비밀번호를 입력하세요."
         visible={popup}
-        setVisible={setPopup}
-        condition={(value) => validate("password", value)}
+        onVisibleChange={setPopup}
+        confirmCondition={(value) => validate("password", value)}
         inputType="password"
-        onInput={(password) => {
-          const storage = getStorage();
+        onClose={(e) => {
+          if (e.button === "confirm") {
+            const storage = getStorage();
 
-          request(
-            "patch",
-            `${getServer()}/user/auth/update`,
-            {
-              oldPassword: password,
-              username: temp,
-            },
-            {
-              Authorization: storage?.login?.jwt,
-            }
-          )
-            .then(() => {
-              user.data.username = temp;
-            })
-            .catch(() => {
-              window.confirm("닉네임 변경 오류");
-            });
+            request(
+              "patch",
+              `${getServer()}/user/auth/update`,
+              {
+                oldPassword: e.value,
+                username: temp,
+              },
+              {
+                Authorization: storage?.login?.jwt,
+              }
+            )
+              .then(() => {
+                user.username = temp;
+              })
+              .catch(() => {
+                window.confirm("닉네임 변경 오류");
+                setUsername(user.username);
+              });
+          } else {
+            setUsername(user.username);
+          }
         }}
-        onCancel={() => setUsername(user.data.username)}
       />
     </div>
   );

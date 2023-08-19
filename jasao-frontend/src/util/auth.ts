@@ -1,3 +1,6 @@
+import { getServer, request, requestWithLogin } from "./server";
+import { getStorage } from "./storage";
+
 export type authType = "email" | "username" | "password";
 
 export const emailRe = new RegExp("^[\\w]+@([\\w-\\.]+\\.)+[\\w]{2,4}$");

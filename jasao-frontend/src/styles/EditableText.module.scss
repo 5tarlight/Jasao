@@ -4,14 +4,19 @@
   padding: 0;
 }
 
-textarea,
-input {
+.textarea,
+.input {
   width: 100%;
 }
 
-textarea:focus,
-input:focus {
+.textarea:focus,
+.input:focus {
   outline: $pri solid 1px;
   border: none;
   resize: none;
+}
+
+.value {
+  width: 100%;
+  overflow: hidden;
 }
