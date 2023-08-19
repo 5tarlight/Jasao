@@ -40,6 +40,8 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
   const [following, setFollowing] = useState<number[]>([]);
   const [friend, setFriend] = useState(0);
 
+  console.log(getStorage());
+
   const action = (type: UserActionType) => {
     switch (type) {
       case "add-friend":
@@ -55,7 +57,7 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
             `${getServer()}/users/auth/follow`,
             { target: user.id },
             {
-              Authorization: storage?.user?.token,
+              Authorization: storage?.login?.jwt,
             }
           )
             .then(() => refreshFollowList("followed"))
@@ -73,7 +75,7 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
             `${getServer()}/users/auth/unfollow`,
             { target: user.id },
             {
-              Authorization: storage?.user?.token,
+              Authorization: storage?.login?.jwt,
             }
           )
             .then(() => refreshFollowList("followed"))
