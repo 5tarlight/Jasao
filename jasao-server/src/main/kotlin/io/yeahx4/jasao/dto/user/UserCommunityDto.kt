@@ -23,3 +23,10 @@ data class FollowPageResDto(
         }
     }
 }
+
+data class FollowResDto(
+    val page: Int,
+    val maxPage: Int,
+    val count: Int,
+    val payload: List<FollowPageResDto>
+)
