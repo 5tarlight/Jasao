@@ -2,11 +2,12 @@ import { FC, useEffect, useState } from "react";
 import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import { useNavigate, useParams } from "react-router-dom";
-import UserInformation from "../../components/profile/UserInformation";
+import UserInfo from "../../components/profile/UserInfo";
 import { getServer, request } from "../../util/server";
 import { getStorage } from "../../util/storage";
 import { isNumeric } from "../../util/utilities";
 import { User, UserRes } from "../../util/user";
+import FollowInfo from "../../components/profile/FollowInfo";
 
 const cx = classNames.bind(styles);
 
@@ -33,12 +34,14 @@ const ViewProfile: FC = () => {
 
   return (
     <>
-      {userData && isMine !== undefined ? (
+      {userData ? (
         <div className={cx("contatiner")}>
           <div className={cx("info")}>
-            <UserInformation user={userData} isMine={isMine()} myId={myId} />
+            <UserInfo user={userData} isMine={isMine()} myId={myId} />
           </div>
-          <div className={cx("content")}></div>
+          <div className={cx("content")}>
+            <FollowInfo />
+          </div>
         </div>
       ) : undefined}
     </>
