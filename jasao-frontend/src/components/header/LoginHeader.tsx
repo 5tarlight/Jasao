@@ -2,7 +2,7 @@ import { FC, useState, useRef } from "react";
 import styles from "../../styles/header/Header.module.scss";
 import classNames from "classnames/bind";
 import HeaderDropdown from "./HeaderDropdown";
-import ProfileImage from "../ProfileImage";
+import ProfileImage from "../profile/ProfileImage";
 
 const cx = classNames.bind(styles);
 

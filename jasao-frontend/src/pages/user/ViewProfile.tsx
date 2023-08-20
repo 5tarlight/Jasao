@@ -40,7 +40,7 @@ const ViewProfile: FC = () => {
             <UserInfo user={userData} isMine={isMine()} myId={myId} />
           </div>
           <div className={cx("content")}>
-            <FollowInfo />
+            <FollowInfo targetId={targetId} />
           </div>
         </div>
       ) : undefined}

@@ -9,9 +9,17 @@ interface Props {
   tabIndex?: number;
   tabName?: string[];
   onTabIndexChange?: (value: number) => void;
+  width?: number | string;
+  height?: number | string;
 }
 
-const TabPage: FC<Props> = ({ children, tabName, tabIndex = 0 }) => {
+const TabPage: FC<Props> = ({
+  children,
+  tabName,
+  tabIndex = 0,
+  width,
+  height,
+}) => {
   const [index, setIndex] = useState(tabIndex);
 
   useEffect(() => {
@@ -19,24 +27,20 @@ const TabPage: FC<Props> = ({ children, tabName, tabIndex = 0 }) => {
   }, [setIndex, tabIndex]);
 
   return (
-    <div className={cx("tabpage")}>
+    <div className={cx("tabpage")} style={{ width, height }}>
       <div className={cx("tabpage-tab")}>
         {Children.map(children, (child, i) =>
           tabName ? (
-            tabName.length > i ? (
-              <div
-                className={cx("tabpage-tab-item", [
-                  { "tabpage-tab-item-enable": index === i },
-                ])}
-                onClick={() => {
-                  if (index !== i) setIndex(i);
-                }}
-              >
-                {tabName[i]}
-              </div>
-            ) : (
-              ""
-            )
+            <div
+              className={cx("tabpage-tab-item", [
+                { "tabpage-tab-item-enable": index === i },
+              ])}
+              onClick={() => {
+                if (index !== i) setIndex(i);
+              }}
+            >
+              {tabName.length > i ? tabName[i] : ""}
+            </div>
           ) : (
             ""
           )

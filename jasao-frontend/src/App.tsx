@@ -9,7 +9,7 @@ import SignUp from "./pages/auth/SignUp";
 import Logout from "./pages/auth/Logout";
 import Test from "./pages/test";
 import Footer from "./components/footer/Footer";
-import ViewProfile from "./pages/profile/ViewProfile";
+import ViewProfile from "./pages/user/ViewProfile";
 import PopupTest from "./pages/popupTest";
 
 const cx = classNames.bind(styles);

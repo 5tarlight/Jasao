@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
-import ProfileImage from "../ProfileImage";
+import ProfileImage from "./ProfileImage";
 import EditableText from "../EditableText";
 import { validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
