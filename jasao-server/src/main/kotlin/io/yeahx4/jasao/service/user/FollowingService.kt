@@ -23,7 +23,7 @@ class FollowingService(
     fun findByFollower(self: Long, pageable: Pageable): FollowResDto {
         val page = this.followingRepository.findByFollowerOrderByCreatedAtDesc(self, pageable)
         val list = page
-            .map { it.follower }
+            .map { it.followed }
             .mapNotNull { userService.getUserById(it) }
             .map { FollowPageResDto.fromUser(it) }
         val count = this.followingRepository.countByFollower(self)

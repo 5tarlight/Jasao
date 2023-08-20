@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
-import ProfileImage from "../ProfileImage";
+import ProfileImage from "./ProfileImage";
 import EditableText from "../EditableText";
 import { validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
@@ -21,7 +21,17 @@ type UserActionType =
 
 interface FollowRes {
   message: string;
-  data: number[];
+  data: {
+    page: number;
+    maxPage: number;
+    count: number;
+    payload: {
+      id: number;
+      username: string;
+      profile: string;
+      bio: string;
+    }[];
+  };
 }
 
 interface Props {
@@ -30,17 +40,15 @@ interface Props {
   myId: number | undefined;
 }
 
-const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
+const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
   const [popup, setPopup] = useState(false);
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.username);
   const [isFriend, setIsFriend] = useState(false);
   const [isFollowed, setIsFollowed] = useState(false);
-  const [followed, setFollowed] = useState<number[]>([]);
-  const [following, setFollowing] = useState<number[]>([]);
+  const [followed, setFollowed] = useState<number>(0);
+  const [following, setFollowing] = useState<number>(0);
   const [friend, setFriend] = useState(0);
-
-  console.log(getStorage());
 
   const action = (type: UserActionType) => {
     switch (type) {
@@ -99,8 +107,8 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
         {}
       )
         .then((res) => {
-          if (type === "followed") setFollowed(res.data.data);
-          else setFollowing(res.data.data);
+          if (type === "followed") setFollowed(res.data.data.count);
+          else setFollowing(res.data.data.count);
         })
         .catch(() => console.log(`failed get ${type}: user/${user.id}`));
     },
@@ -116,7 +124,7 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
   }, [setFollowing, user, refreshFollowList]);
 
   useEffect(() => {
-    if (myId) setIsFollowed(followed.includes(myId));
+    // if (myId) setIsFollowed(followed.includes(myId));
   }, [followed, myId]);
 
   useEffect(() => {
@@ -136,7 +144,7 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
     <div className={cx("info-container")}>
       <ProfileImage
         image={user.profile}
-        size={16.5 * 16}
+        size={15 * 16}
         style={{
           borderWidth: 2,
           borderStyle: "solid",
@@ -153,8 +161,8 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
         />
         <div className={cx("info-value-container")}>
           <div>{friend} 친구</div>
-          <div>{following.length} 팔로잉</div>
-          <div>{followed.length} 팔로워</div>
+          <div>{following} 팔로잉</div>
+          <div>{followed} 팔로워</div>
         </div>
         <div className={cx("info-value-container")}>
           <div>124 카페 가입</div>
@@ -240,4 +248,4 @@ const UserInformation: FC<Props> = ({ user, isMine, myId }) => {
   );
 };
 
-export default UserInformation;
+export default UserInfo;

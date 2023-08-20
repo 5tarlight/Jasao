@@ -1,0 +1,52 @@
+@import "../Constant.scss";
+
+.item {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid $pri;
+  padding-bottom: 2rem;
+  margin-top: 2rem;
+}
+
+.profile-image {
+  margin-right: 1.5rem;
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.username {
+  transition: color 0.2s;
+  font-size: 1.25rem;
+
+  &:hover {
+    cursor: pointer;
+    color: $link;
+  }
+}
+
+.bio {
+  color: $text-light;
+}
+
+.page-selector {
+  display: flex;
+  justify-content: center;
+  margin: 2rem;
+  user-select: none;
+
+  * {
+    padding: 0 0.7rem 0 0.7rem;
+  }
+}
+
+.page-previous,
+.page-next {
+  transition: color 0.2s;
+
+  &:hover {
+    cursor: pointer;
+    color: $link;
+  }
+}
