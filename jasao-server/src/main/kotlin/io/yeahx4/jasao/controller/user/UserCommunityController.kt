@@ -2,6 +2,7 @@ package io.yeahx4.jasao.controller.user
 
 import io.yeahx4.jasao.dto.user.FollowDto
 import io.yeahx4.jasao.dto.user.FollowPageResDto
+import io.yeahx4.jasao.dto.user.FollowResDto
 import io.yeahx4.jasao.service.user.FollowingService
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.service.user.UserService
@@ -74,7 +75,7 @@ class UserCommunityController(
             page = 0
         )
         pageable: Pageable
-    ): Res<List<FollowPageResDto>> {
+    ): Res<FollowResDto> {
         return Res(
             HttpResponse("Ok", this.followingService.findByFollower(id, pageable)),
             HttpStatus.OK
@@ -89,7 +90,7 @@ class UserCommunityController(
             page = 0
         )
         pageable: Pageable
-    ): Res<List<FollowPageResDto>> {
+    ): Res<FollowResDto> {
         return Res(
             HttpResponse("Ok", this.followingService.findByFollowed(id, pageable)),
             HttpStatus.OK
