@@ -1,7 +1,6 @@
 package io.yeahx4.jasao.controller.user
 
 import io.yeahx4.jasao.dto.user.FollowDto
-import io.yeahx4.jasao.dto.user.FollowPageResDto
 import io.yeahx4.jasao.dto.user.FollowResDto
 import io.yeahx4.jasao.service.user.FollowingService
 import io.yeahx4.jasao.service.user.JwtService
