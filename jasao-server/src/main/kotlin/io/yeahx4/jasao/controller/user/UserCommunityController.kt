@@ -1,7 +1,6 @@
 package io.yeahx4.jasao.controller.user
 
 import io.yeahx4.jasao.dto.user.FollowDto
-import io.yeahx4.jasao.dto.user.FollowPageResDto
 import io.yeahx4.jasao.dto.user.FollowResDto
 import io.yeahx4.jasao.service.user.FollowingService
 import io.yeahx4.jasao.service.user.JwtService
@@ -95,5 +94,14 @@ class UserCommunityController(
             HttpResponse("Ok", this.followingService.findByFollowed(id, pageable)),
             HttpStatus.OK
         )
+    }
+
+    @GetMapping("/auth/isfollow")
+    fun isFollowing(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestParam target: Long
+    ): Boolean {
+        val me = this.jwtService.getUserFromToken(jwt);
+        return this.followingService.isUserFollow(me.id, target);
     }
 }
