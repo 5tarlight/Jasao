@@ -96,4 +96,13 @@ class UserCommunityController(
             HttpStatus.OK
         )
     }
+
+    @GetMapping("/auth/isfollow")
+    fun isFollowing(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestParam target: Long
+    ): Boolean {
+        val me = this.jwtService.getUserFromToken(jwt);
+        return this.followingService.isUserFollow(me.id, target);
+    }
 }
