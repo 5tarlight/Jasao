@@ -9,7 +9,6 @@ export interface UserMemory {
   profile: string;
   username: string;
   bio: string;
-  token: string;
   role: string;
 }
 

@@ -71,7 +71,7 @@ export const requestWithLogin = <T>(
 
     if (storage?.login?.login) {
       request<T>(method, `${getServer()}/${url}`, data, {
-        Authorization: storage?.user?.token,
+        Authorization: storage?.login.jwt,
         ...headers,
       })
         .then((res) => resolve(res.data))
