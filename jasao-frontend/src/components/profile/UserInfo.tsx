@@ -52,12 +52,10 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.username);
   const [bio, setBio] = useState(user.bio);
-  // const [isFriend, setIsFriend] = useState(false);
   const [isFollowed, setIsFollowed] = useState(false);
   const [followed, setFollowed] = useState<number>(0);
   const [following, setFollowing] = useState<number>(0);
   const [editType, setEditType] = useState<"username" | "bio">("username");
-  // const [friend, setFriend] = useState(0);
 
   const [messagePopup, setMessagePopup] = useState({
     visible: false,
@@ -196,7 +194,6 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           defaultValue="bio..."
         />
         <div className={cx("info-value-container")}>
-          <div>{0} 친구</div>
           <div>{following} 팔로잉</div>
           <div>{followed} 팔로워</div>
         </div>
@@ -225,18 +222,11 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         ) : (
           <>
             <button
-              className={cx("info-button", "info-button-2")}
+              className={cx("info-button", "info-button-1")}
               hidden={isMine}
               onClick={() => action(isFollowed ? "unfollow" : "follow")}
             >
               {isFollowed ? "언팔로우" : "팔로우"}
-            </button>
-            <button
-              className={cx("info-button", "info-button-2")}
-              hidden={isMine}
-              onClick={() => action(false ? "remove-friend" : "add-friend")}
-            >
-              {false ? "친구 삭제" : "친구 추가"}
             </button>
           </>
         )}
