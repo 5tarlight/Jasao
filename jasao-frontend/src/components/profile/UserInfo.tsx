@@ -51,10 +51,12 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
   const [pwPopup, setPwPopup] = useState(false);
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.username);
+  const [bio, setBio] = useState(user.bio);
   // const [isFriend, setIsFriend] = useState(false);
   const [isFollowed, setIsFollowed] = useState(false);
   const [followed, setFollowed] = useState<number>(0);
   const [following, setFollowing] = useState<number>(0);
+  const [editType, setEditType] = useState<"username" | "bio">("username");
   // const [friend, setFriend] = useState(0);
 
   const action = (type: UserActionType) => {
@@ -128,9 +130,17 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
     setUsername(user.username);
   }, [user]);
 
-  const edit = (value: string) => {
-    if (user.username === value) {
-      return;
+  const edit = (type: "username" | "bio", value: string) => {
+    setEditType(type);
+
+    switch (type) {
+      case "username":
+        if (user.username === value) return;
+        break;
+
+      case "bio":
+        if (user.bio === value) return;
+        break;
     }
 
     setTemp(value);
@@ -158,8 +168,18 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           className={cx("info-username")}
           value={username}
           onChange={setUsername}
-          onEdit={edit}
+          onEdit={(value) => edit("username", value)}
           editable={isMine}
+        />
+        <EditableText
+          className={cx("info-bio")}
+          value={bio}
+          onChange={setBio}
+          onEdit={(value) => edit("bio", value)}
+          editable={isMine}
+          multiline
+          rows={3}
+          defaultValue="bio..."
         />
         <div className={cx("info-value-container")}>
           <div>{0} 친구</div>
@@ -224,27 +244,33 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         onClose={(e) => {
           if (e.button === "confirm") {
             const storage = getStorage();
+            let data;
+            if (editType === "username") data = { username: temp };
+            else if (editType === "bio") data = { bio: temp };
 
             request(
               "patch",
               `${getServer()}/user/auth/update`,
               {
                 oldPassword: e.input?.value,
-                username: temp,
+                ...data,
               },
               {
                 Authorization: storage?.login?.jwt,
               }
             )
               .then(() => {
-                user.username = temp;
+                if (editType === "username") user.username = temp;
+                if (editType === "bio") user.bio = temp;
               })
               .catch(() => {
-                window.confirm("닉네임 변경 오류");
-                setUsername(user.username);
+                window.alert("변경 오류");
+                if (editType === "username") setUsername(user.username);
+                if (editType === "bio") setBio(user.bio);
               });
           } else {
-            setUsername(user.username);
+            if (editType === "username") setUsername(user.username);
+            if (editType === "bio") setBio(user.bio);
           }
         }}
       />
