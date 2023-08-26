@@ -59,6 +59,20 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
   const [editType, setEditType] = useState<"username" | "bio">("username");
   // const [friend, setFriend] = useState(0);
 
+  const [messagePopup, setMessagePopup] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
+
+  const sendMessage = (title: string, message: string) => {
+    setMessagePopup({
+      title,
+      message,
+      visible: true,
+    });
+  };
+
   const action = (type: UserActionType) => {
     switch (type) {
       case "add-friend":
@@ -187,12 +201,12 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           <div>{followed} 팔로워</div>
         </div>
         <div className={cx("info-value-container")}>
-          <div>124 카페 가입</div>
-          <div>562 카페 소유</div>
+          <div>0 카페 가입</div>
+          <div>0 카페 소유</div>
         </div>
         <div className={cx("info-value-container")}>
-          <div>5125 게시글</div>
-          <div>124 댓글</div>
+          <div>0 게시글</div>
+          <div>0 댓글</div>
         </div>
       </div>
       <div
@@ -244,9 +258,21 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         onClose={(e) => {
           if (e.button === "confirm") {
             const storage = getStorage();
+            const showMessage = (message: string) => {
+              sendMessage("오류", message);
+              if (editType === "username") setUsername(user.username);
+              if (editType === "bio") setBio(user.bio);
+            };
             let data;
-            if (editType === "username") data = { username: temp };
-            else if (editType === "bio") data = { bio: temp };
+
+            if (
+              editType === "username" &&
+              validate("username", temp, showMessage)
+            )
+              data = { username: temp };
+            else if (editType === "bio" && validate("bio", temp, showMessage))
+              data = { bio: temp };
+            else return;
 
             request(
               "patch",
@@ -264,7 +290,12 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
                 if (editType === "bio") user.bio = temp;
               })
               .catch(() => {
-                window.alert("변경 오류");
+                sendMessage(
+                  "오류",
+                  `${
+                    editType === "username" ? "닉네임" : "bio"
+                  } 변경에 실패하였습니다.`
+                );
                 if (editType === "username") setUsername(user.username);
                 if (editType === "bio") setBio(user.bio);
               });
@@ -296,14 +327,23 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
               })
               .catch((reason) => {
                 console.log(reason);
-                window.alert("프로필 사진 업로드에 실패하였습니다.");
+                sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
               });
-          } else window.alert("프로필 사진 업로드에 실패하였습니다.");
+          } else sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
         }}
         upload={{
           defaultPreview: `${getCdn()}/${getStorage()?.user?.profile!}`,
           confirmCondition: (value) => value !== null,
         }}
+      />
+
+      <Popup
+        title={messagePopup.title}
+        message={messagePopup.message}
+        visible={messagePopup.visible}
+        onVisibleChange={(v) =>
+          setMessagePopup({ ...messagePopup, visible: v })
+        }
       />
     </div>
   );
