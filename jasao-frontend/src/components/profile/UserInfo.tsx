@@ -5,7 +5,7 @@ import ProfileImage from "./ProfileImage";
 import EditableText from "../EditableText";
 import { validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
-import { getServer, request } from "../../util/server";
+import { getServer, request, requestWithLogin } from "../../util/server";
 import { User } from "../../util/user";
 import Popup from "../popup/Popup";
 
@@ -58,16 +58,10 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
       case "follow":
         if (!isFollowed) {
           const storage = getStorage();
-          console.log(storage);
 
-          request(
-            "post",
-            `${getServer()}/users/auth/follow`,
-            { target: user.id },
-            {
-              Authorization: storage?.login?.jwt,
-            }
-          )
+          requestWithLogin("post", `users/auth/follow`, {
+            target: user.id,
+          })
             .then(() => refreshFollowList("followed"))
             .catch((reason) => console.log(reason));
         }
@@ -76,16 +70,10 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
       case "unfollow":
         if (isFollowed) {
           const storage = getStorage();
-          console.log(storage);
 
-          request(
-            "post",
-            `${getServer()}/users/auth/unfollow`,
-            { target: user.id },
-            {
-              Authorization: storage?.login?.jwt,
-            }
-          )
+          requestWithLogin("post", `users/auth/unfollow`, {
+            target: user.id,
+          })
             .then(() => refreshFollowList("followed"))
             .catch((reason) => console.log(reason));
         }
@@ -124,8 +112,14 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
   }, [setFollowing, user, refreshFollowList]);
 
   useEffect(() => {
-    // if (myId) setIsFollowed(followed.includes(myId));
-  }, [followed, myId]);
+    requestWithLogin<boolean>(
+      "get",
+      `users/auth/isfollow?target=${user.id}`,
+      {}
+    )
+      .then((r) => setIsFollowed(r))
+      .catch((reason) => console.log(reason));
+  }, [user.id, setIsFollowed, followed]);
 
   useEffect(() => {
     setUsername(user.username);

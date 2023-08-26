@@ -69,7 +69,7 @@ const FollowList: FC<Props> = ({ type, targetId, page: defaultPage = 0 }) => {
                   <div className={cx("username")} onClick={() => link(user.id)}>
                     {user.username}
                   </div>
-                  <div className={cx("bio")}>{user.bio} test BIO!</div>
+                  <div className={cx("bio")}>{user.bio}</div>
                 </div>
               </div>
             ))

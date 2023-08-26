@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
 import styles from "../../styles/popup/Popup.module.scss";
 import classNames from "classnames/bind";
 import Input from "./Input";
@@ -49,6 +49,7 @@ const Popup: FC<Props> = ({
 }) => {
   const [value, setValue] = useState(defaultValue);
   const [btnEnable, setBtnEnable] = useState(confirmCondition(value));
+  const divRef = useRef<HTMLDivElement>(null);
 
   const onClick = (button: buttonType) => {
     switch (button) {
@@ -93,6 +94,7 @@ const Popup: FC<Props> = ({
   return visible ? (
     <div
       className={cx("popup-background")}
+      ref={divRef}
       style={{ backgroundColor: `rgba(0, 0, 0, ${backgroundOpacity})` }}
       onKeyDown={(e) => {
         if (e.key === "Enter") onClick("confirm");
