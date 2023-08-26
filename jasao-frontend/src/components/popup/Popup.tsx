@@ -32,6 +32,7 @@ interface Props {
   cancelText?: string;
   button?: buttonType[];
   message?: string;
+  onError?: (message: string) => void;
   input?: {
     value?: string;
     type?: React.HTMLInputTypeAttribute;
@@ -43,6 +44,10 @@ interface Props {
     defaultPreview?: string;
     preview?: boolean;
     confirmCondition?: (file: File | null) => boolean;
+    imgSizeXLimit?: number;
+    imgSizeYLimit?: number;
+    sizeLimit?: number;
+    exts?: string;
   };
 }
 
@@ -59,7 +64,7 @@ const Popup: FC<Props> = ({
   confirmText = "확인",
   cancelText = "취소",
   button = ["cancel", "confirm"],
-
+  onError,
   upload,
 }) => {
   const [value, setValue] = useState(input?.value ? input.value : "");
@@ -116,7 +121,12 @@ const Popup: FC<Props> = ({
           <UploadFile
             file={upload?.file}
             preview={upload?.preview}
-            onFileChanged={(f) => setFile(f)}
+            onFileChanged={setFile}
+            limitFileSize={upload?.sizeLimit}
+            limitImgSizeX={upload?.imgSizeXLimit}
+            limitImgSizeY={upload?.imgSizeYLimit}
+            onError={onError}
+            acceptExts={upload?.exts}
           />
         );
     }

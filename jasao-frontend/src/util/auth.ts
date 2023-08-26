@@ -69,3 +69,12 @@ export const validate = (
   }
   return true;
 };
+
+export const imgLimit = {
+  profile: {
+    imgSizeX: 1024,
+    imgSizeY: 1024,
+    fileSize: 5 * 1024 * 1024,
+    exts: "image/jpeg, image/png",
+  },
+};

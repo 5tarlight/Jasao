@@ -3,7 +3,7 @@ import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import ProfileImage from "./ProfileImage";
 import EditableText from "../EditableText";
-import { validate } from "../../util/auth";
+import { imgLimit, validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
 import {
   getCdn,
@@ -319,12 +319,18 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
                 console.log(reason);
                 sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
               });
-          } else sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
+          } else if (e.button !== "cancel")
+            sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
         }}
         upload={{
           defaultPreview: `${getCdn()}/${getStorage()?.user?.profile!}`,
           confirmCondition: (value) => value !== null,
+          imgSizeXLimit: imgLimit.profile.imgSizeX,
+          imgSizeYLimit: imgLimit.profile.imgSizeY,
+          sizeLimit: imgLimit.profile.fileSize,
+          exts: imgLimit.profile.exts,
         }}
+        onError={(message) => sendMessage("오류", message)}
       />
 
       <Popup
@@ -334,6 +340,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         onVisibleChange={(v) =>
           setMessagePopup({ ...messagePopup, visible: v })
         }
+        button={["confirm"]}
       />
     </div>
   );
