@@ -3,11 +3,17 @@ import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import ProfileImage from "./ProfileImage";
 import EditableText from "../EditableText";
-import { validate } from "../../util/auth";
+import { imgLimit, validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
-import { getServer, request, requestWithLogin } from "../../util/server";
+import {
+  getCdn,
+  getServer,
+  request,
+  requestWithLogin,
+} from "../../util/server";
 import { User } from "../../util/user";
 import Popup from "../popup/Popup";
+import axios from "axios";
 
 const cx = classNames.bind(styles);
 
@@ -41,14 +47,29 @@ interface Props {
 }
 
 const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
-  const [popup, setPopup] = useState(false);
+  const [uploadPopup, setUploadPopup] = useState(false);
+  const [pwPopup, setPwPopup] = useState(false);
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.username);
-  const [isFriend, setIsFriend] = useState(false);
+  const [bio, setBio] = useState(user.bio);
   const [isFollowed, setIsFollowed] = useState(false);
   const [followed, setFollowed] = useState<number>(0);
   const [following, setFollowing] = useState<number>(0);
-  const [friend, setFriend] = useState(0);
+  const [editType, setEditType] = useState<"username" | "bio">("username");
+
+  const [messagePopup, setMessagePopup] = useState({
+    visible: false,
+    title: "",
+    message: "",
+  });
+
+  const sendMessage = (title: string, message: string) => {
+    setMessagePopup({
+      title,
+      message,
+      visible: true,
+    });
+  };
 
   const action = (type: UserActionType) => {
     switch (type) {
@@ -57,8 +78,6 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
 
       case "follow":
         if (!isFollowed) {
-          const storage = getStorage();
-
           requestWithLogin("post", `users/auth/follow`, {
             target: user.id,
           })
@@ -69,8 +88,6 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
 
       case "unfollow":
         if (isFollowed) {
-          const storage = getStorage();
-
           requestWithLogin("post", `users/auth/unfollow`, {
             target: user.id,
           })
@@ -125,46 +142,68 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
     setUsername(user.username);
   }, [user]);
 
-  const edit = (value: string) => {
-    if (user.username === value) {
-      return;
+  const edit = (type: "username" | "bio", value: string) => {
+    setEditType(type);
+
+    switch (type) {
+      case "username":
+        if (user.username === value) return;
+        break;
+
+      case "bio":
+        if (user.bio === value) return;
+        break;
     }
 
     setTemp(value);
-    setPopup(true);
+    setPwPopup(true);
   };
 
   return (
     <div className={cx("info-container")}>
-      <ProfileImage
-        image={user.profile}
-        size={15 * 16}
-        style={{
-          borderWidth: 2,
-          borderStyle: "solid",
-          borderColor: "#777777",
-        }}
-      ></ProfileImage>
+      <span
+        className={cx("info-profile-image")}
+        onClick={() => setUploadPopup(true)}
+      >
+        <ProfileImage
+          image={user.profile}
+          size={15 * 16}
+          style={{
+            borderWidth: 2,
+            borderStyle: "solid",
+            borderColor: "#777777",
+          }}
+        ></ProfileImage>
+      </span>
       <div className={cx("info-text-container")}>
         <EditableText
           className={cx("info-username")}
           value={username}
           onChange={setUsername}
-          onEdit={edit}
+          onEdit={(value) => edit("username", value)}
           editable={isMine}
         />
+        <EditableText
+          className={cx("info-bio")}
+          value={bio}
+          onChange={setBio}
+          onEdit={(value) => edit("bio", value)}
+          editable={isMine}
+          multiline
+          rows={3}
+          defaultValue="bio..."
+        />
         <div className={cx("info-value-container")}>
-          <div>{friend} 친구</div>
           <div>{following} 팔로잉</div>
           <div>{followed} 팔로워</div>
         </div>
         <div className={cx("info-value-container")}>
-          <div>124 카페 가입</div>
-          <div>562 카페 소유</div>
+          <div>0 카페 가입</div>
+          <div>0 카페 소유</div>
         </div>
         <div className={cx("info-value-container")}>
-          <div>5125 게시글</div>
-          <div>124 댓글</div>
+          <div>0 게시글</div>
+          <div>0 댓글</div>
         </div>
       </div>
       <div
@@ -183,18 +222,11 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         ) : (
           <>
             <button
-              className={cx("info-button", "info-button-2")}
+              className={cx("info-button", "info-button-1")}
               hidden={isMine}
               onClick={() => action(isFollowed ? "unfollow" : "follow")}
             >
               {isFollowed ? "언팔로우" : "팔로우"}
-            </button>
-            <button
-              className={cx("info-button", "info-button-2")}
-              hidden={isMine}
-              onClick={() => action(isFriend ? "remove-friend" : "add-friend")}
-            >
-              {isFriend ? "친구 삭제" : "친구 추가"}
             </button>
           </>
         )}
@@ -207,36 +239,108 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
       <Popup
         type="input"
         title="비밀번호를 입력하세요."
-        visible={popup}
-        onVisibleChange={setPopup}
-        confirmCondition={(value) => validate("password", value)}
-        inputType="password"
+        visible={pwPopup}
+        onVisibleChange={setPwPopup}
+        input={{
+          type: "password",
+          confirmCondition: (value) => validate("password", value),
+        }}
         onClose={(e) => {
           if (e.button === "confirm") {
             const storage = getStorage();
+            const showMessage = (message: string) => {
+              sendMessage("오류", message);
+              if (editType === "username") setUsername(user.username);
+              if (editType === "bio") setBio(user.bio);
+            };
+            let data;
+
+            if (
+              editType === "username" &&
+              validate("username", temp, showMessage)
+            )
+              data = { username: temp };
+            else if (editType === "bio" && validate("bio", temp, showMessage))
+              data = { bio: temp };
+            else return;
 
             request(
               "patch",
               `${getServer()}/user/auth/update`,
               {
-                oldPassword: e.value,
-                username: temp,
+                oldPassword: e.input?.value,
+                ...data,
               },
               {
                 Authorization: storage?.login?.jwt,
               }
             )
               .then(() => {
-                user.username = temp;
+                if (editType === "username") user.username = temp;
+                if (editType === "bio") user.bio = temp;
               })
               .catch(() => {
-                window.confirm("닉네임 변경 오류");
-                setUsername(user.username);
+                sendMessage(
+                  "오류",
+                  `${
+                    editType === "username" ? "닉네임" : "bio"
+                  } 변경에 실패하였습니다.`
+                );
+                if (editType === "username") setUsername(user.username);
+                if (editType === "bio") setBio(user.bio);
               });
           } else {
-            setUsername(user.username);
+            if (editType === "username") setUsername(user.username);
+            if (editType === "bio") setBio(user.bio);
           }
         }}
+      />
+      <Popup
+        title="프로필 사진 변경"
+        message="프로필을 변경하시려면 사진을 업로드 하세요."
+        type="upload"
+        visible={uploadPopup}
+        onVisibleChange={setUploadPopup}
+        onClose={(e) => {
+          if (e.button === "confirm" && e.upload?.file) {
+            const formData = new FormData();
+            formData.append("file", e.upload?.file);
+            axios
+              .post(`${getServer()}/file/auth/upload?role=profile`, formData, {
+                headers: {
+                  Authorization: getStorage()?.login?.jwt,
+                  "Content-Type": "multipart/form-data",
+                },
+              })
+              .then(() => {
+                window.location.reload();
+              })
+              .catch((reason) => {
+                console.log(reason);
+                sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
+              });
+          } else if (e.button !== "cancel")
+            sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
+        }}
+        upload={{
+          defaultPreview: `${getCdn()}/${getStorage()?.user?.profile!}`,
+          confirmCondition: (value) => value !== null,
+          imgSizeXLimit: imgLimit.profile.imgSizeX,
+          imgSizeYLimit: imgLimit.profile.imgSizeY,
+          sizeLimit: imgLimit.profile.fileSize,
+          exts: imgLimit.profile.exts,
+        }}
+        onError={(message) => sendMessage("오류", message)}
+      />
+
+      <Popup
+        title={messagePopup.title}
+        message={messagePopup.message}
+        visible={messagePopup.visible}
+        onVisibleChange={(v) =>
+          setMessagePopup({ ...messagePopup, visible: v })
+        }
+        button={["confirm"]}
       />
     </div>
   );

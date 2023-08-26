@@ -2,16 +2,22 @@ import { FC, useCallback, useEffect, useRef, useState } from "react";
 import styles from "../../styles/popup/Popup.module.scss";
 import classNames from "classnames/bind";
 import Input from "./Input";
+import UploadFile from "./UploadFile";
 
 const cx = classNames.bind(styles);
 
-type popupType = "none" | "input";
+type popupType = "none" | "input" | "upload";
 type buttonType = "cancel" | "confirm";
 
 interface closeEventArgs {
   type: popupType;
   button: buttonType;
-  value: string;
+  input?: {
+    value: string;
+  };
+  upload?: {
+    file: File | null;
+  };
 }
 
 interface Props {
@@ -22,13 +28,27 @@ interface Props {
   width?: number;
   title?: string;
   onClose?: (e: closeEventArgs) => void;
-  value?: string;
   confirmText?: string;
   cancelText?: string;
   button?: buttonType[];
-  inputType?: React.HTMLInputTypeAttribute;
-  confirmCondition?: (value: string) => boolean;
   message?: string;
+  onError?: (message: string) => void;
+  input?: {
+    value?: string;
+    type?: React.HTMLInputTypeAttribute;
+    confirmCondition?: (value: string) => boolean;
+  };
+
+  upload?: {
+    file?: File;
+    defaultPreview?: string;
+    preview?: boolean;
+    confirmCondition?: (file: File | null) => boolean;
+    imgSizeXLimit?: number;
+    imgSizeYLimit?: number;
+    sizeLimit?: number;
+    exts?: string;
+  };
 }
 
 const Popup: FC<Props> = ({
@@ -39,16 +59,17 @@ const Popup: FC<Props> = ({
   width = 400,
   title,
   onClose,
-  value: defaultValue = "",
+  input,
   message,
   confirmText = "확인",
   cancelText = "취소",
   button = ["cancel", "confirm"],
-  confirmCondition = () => true,
-  inputType,
+  onError,
+  upload,
 }) => {
-  const [value, setValue] = useState(defaultValue);
-  const [btnEnable, setBtnEnable] = useState(confirmCondition(value));
+  const [value, setValue] = useState(input?.value ? input.value : "");
+  const [file, setFile] = useState<File | null>(null);
+  const [btnEnable, setBtnEnable] = useState(false);
   const divRef = useRef<HTMLDivElement>(null);
 
   const onClick = (button: buttonType) => {
@@ -63,12 +84,24 @@ const Popup: FC<Props> = ({
 
   const close = (button: buttonType) => {
     if (onVisibleChange) onVisibleChange(false);
-    if (onClose)
-      onClose({
-        type,
-        button,
-        value,
-      });
+    if (onClose) {
+      if (type === "input")
+        onClose({
+          type,
+          button,
+          input: {
+            value,
+          },
+        });
+      else if (type === "upload")
+        onClose({
+          type,
+          button,
+          upload: {
+            file,
+          },
+        });
+    }
 
     setValue("");
   };
@@ -77,19 +110,43 @@ const Popup: FC<Props> = ({
     switch (type) {
       case "input":
         return (
-          <Input value={value} onValueChange={setValue} inputType={inputType} />
+          <Input
+            value={value}
+            onValueChange={setValue}
+            inputType={input?.type}
+          />
+        );
+      case "upload":
+        return (
+          <UploadFile
+            file={upload?.file}
+            preview={upload?.preview}
+            onFileChanged={setFile}
+            limitFileSize={upload?.sizeLimit}
+            limitImgSizeX={upload?.imgSizeXLimit}
+            limitImgSizeY={upload?.imgSizeYLimit}
+            onError={onError}
+            acceptExts={upload?.exts}
+          />
         );
     }
   };
 
-  const checkCondition = useCallback(
-    () => confirmCondition(value),
-    [confirmCondition, value]
-  );
+  const checkCondition = useCallback(() => {
+    if (type === "input" && input?.confirmCondition)
+      return input?.confirmCondition(value);
+    else if (type === "upload" && upload?.confirmCondition)
+      return upload.confirmCondition(file);
+    else return true;
+  }, [input, upload, value, file, type]);
 
   useEffect(() => {
     setBtnEnable(checkCondition());
   }, [value, checkCondition]);
+
+  useEffect(() => {
+    divRef.current?.focus();
+  }, []);
 
   return visible ? (
     <div

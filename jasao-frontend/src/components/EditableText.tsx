@@ -13,6 +13,8 @@ interface Props {
   multiline?: boolean;
   editable?: boolean;
   condition?: (value: string) => boolean;
+  rows?: number;
+  defaultValue?: string;
 }
 
 const EditableText: FC<Props> = ({
@@ -24,6 +26,8 @@ const EditableText: FC<Props> = ({
   editable = false,
   onChange,
   condition,
+  rows = 1,
+  defaultValue = "　",
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isCancel, setIsCancel] = useState(false);
@@ -69,7 +73,7 @@ const EditableText: FC<Props> = ({
             setIsEditing(true);
           }}
         >
-          {value}
+          {value === "" ? defaultValue : value}
         </div>
       ) : multiline ? (
         <textarea
@@ -86,7 +90,7 @@ const EditableText: FC<Props> = ({
               setIsCancel(true);
             }
           }}
-          rows={1}
+          rows={rows}
         ></textarea>
       ) : (
         <input
