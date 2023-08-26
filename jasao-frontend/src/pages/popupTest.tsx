@@ -1,17 +1,24 @@
 import { FC } from "react";
 import Popup from "../components/popup/Popup";
-import { validate } from "../util/auth";
+import { getCdn } from "../util/server";
+import { getStorage } from "../util/storage";
+// import { validate } from "../util/auth";
 
 const PopupTest: FC = () => {
   return (
     <>
       <Popup
-        title="hello"
-        value="asdddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        title="POPUP TEST"
+        type="upload"
         visible
-        confirmCondition={(value) => validate("password", value)}
         onClose={(e) => {
-          window.confirm(e.button);
+          if (e.button === "confirm") {
+            window.alert(e.upload?.file?.name);
+          }
+        }}
+        upload={{
+          defaultPreview: `${getCdn()}/${getStorage()?.user?.profile!}`,
+          confirmCondition: (value) => value !== null,
         }}
       />
     </>

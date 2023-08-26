@@ -94,6 +94,7 @@
 }
 
 .button-cancel {
+  background-color: $dim;
   &:hover {
     background-color: $dim-hover !important;
   }
@@ -102,9 +103,9 @@
     background-color: $dim-active !important;
   }
 
-  &:enabled {
-    background-color: $dim;
-  }
+  // &:enabled {
+  //   background-color: $dim;
+  // }
 
   &:disabled {
     background-color: $text-light !important;
@@ -112,6 +113,7 @@
 }
 
 .button-confirm {
+  background-color: $pri-light;
   &:hover {
     background-color: $pri-light-hover !important;
   }
@@ -120,11 +122,42 @@
     background-color: $pri-light-active !important;
   }
 
-  &:enabled {
-    background-color: $pri-light;
-  }
+  // &:enabled {
+  //   background-color: $pri-light;
+  // }
 
   &:disabled {
     background-color: rgb(221, 221, 221) !important;
+  }
+}
+
+.upload-preview {
+  width: 17rem;
+  height: 17rem;
+
+  border-radius: 50%;
+  border: 2px solid $dim;
+}
+
+.filebox {
+  & input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+  }
+
+  & label[for="file"] {
+    display: inline-block;
+    padding: 0.5rem !important;
+    width: 5rem;
+    margin-left: 1rem;
+    font-size: 0.8rem;
+  }
+
+  & .upload-input {
+    width: 60% !important;
   }
 }

@@ -81,6 +81,12 @@
   }
 }
 
+.info-profile-image {
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 .image-container {
   display: flex;
   justify-content: center;

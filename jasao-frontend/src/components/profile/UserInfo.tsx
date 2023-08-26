@@ -5,9 +5,15 @@ import ProfileImage from "./ProfileImage";
 import EditableText from "../EditableText";
 import { validate } from "../../util/auth";
 import { getStorage } from "../../util/storage";
-import { getServer, request, requestWithLogin } from "../../util/server";
+import {
+  getCdn,
+  getServer,
+  request,
+  requestWithLogin,
+} from "../../util/server";
 import { User } from "../../util/user";
 import Popup from "../popup/Popup";
+import axios from "axios";
 
 const cx = classNames.bind(styles);
 
@@ -41,14 +47,15 @@ interface Props {
 }
 
 const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
-  const [popup, setPopup] = useState(false);
+  const [uploadPopup, setUploadPopup] = useState(false);
+  const [pwPopup, setPwPopup] = useState(false);
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.username);
-  const [isFriend, setIsFriend] = useState(false);
+  // const [isFriend, setIsFriend] = useState(false);
   const [isFollowed, setIsFollowed] = useState(false);
   const [followed, setFollowed] = useState<number>(0);
   const [following, setFollowing] = useState<number>(0);
-  const [friend, setFriend] = useState(0);
+  // const [friend, setFriend] = useState(0);
 
   const action = (type: UserActionType) => {
     switch (type) {
@@ -57,8 +64,6 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
 
       case "follow":
         if (!isFollowed) {
-          const storage = getStorage();
-
           requestWithLogin("post", `users/auth/follow`, {
             target: user.id,
           })
@@ -69,8 +74,6 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
 
       case "unfollow":
         if (isFollowed) {
-          const storage = getStorage();
-
           requestWithLogin("post", `users/auth/unfollow`, {
             target: user.id,
           })
@@ -131,20 +134,25 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
     }
 
     setTemp(value);
-    setPopup(true);
+    setPwPopup(true);
   };
 
   return (
     <div className={cx("info-container")}>
-      <ProfileImage
-        image={user.profile}
-        size={15 * 16}
-        style={{
-          borderWidth: 2,
-          borderStyle: "solid",
-          borderColor: "#777777",
-        }}
-      ></ProfileImage>
+      <span
+        className={cx("info-profile-image")}
+        onClick={() => setUploadPopup(true)}
+      >
+        <ProfileImage
+          image={user.profile}
+          size={15 * 16}
+          style={{
+            borderWidth: 2,
+            borderStyle: "solid",
+            borderColor: "#777777",
+          }}
+        ></ProfileImage>
+      </span>
       <div className={cx("info-text-container")}>
         <EditableText
           className={cx("info-username")}
@@ -154,7 +162,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           editable={isMine}
         />
         <div className={cx("info-value-container")}>
-          <div>{friend} 친구</div>
+          <div>{0} 친구</div>
           <div>{following} 팔로잉</div>
           <div>{followed} 팔로워</div>
         </div>
@@ -192,9 +200,9 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
             <button
               className={cx("info-button", "info-button-2")}
               hidden={isMine}
-              onClick={() => action(isFriend ? "remove-friend" : "add-friend")}
+              onClick={() => action(false ? "remove-friend" : "add-friend")}
             >
-              {isFriend ? "친구 삭제" : "친구 추가"}
+              {false ? "친구 삭제" : "친구 추가"}
             </button>
           </>
         )}
@@ -207,10 +215,12 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
       <Popup
         type="input"
         title="비밀번호를 입력하세요."
-        visible={popup}
-        onVisibleChange={setPopup}
-        confirmCondition={(value) => validate("password", value)}
-        inputType="password"
+        visible={pwPopup}
+        onVisibleChange={setPwPopup}
+        input={{
+          type: "password",
+          confirmCondition: (value) => validate("password", value),
+        }}
         onClose={(e) => {
           if (e.button === "confirm") {
             const storage = getStorage();
@@ -219,7 +229,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
               "patch",
               `${getServer()}/user/auth/update`,
               {
-                oldPassword: e.value,
+                oldPassword: e.input?.value,
                 username: temp,
               },
               {
@@ -236,6 +246,37 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           } else {
             setUsername(user.username);
           }
+        }}
+      />
+      <Popup
+        title="프로필 사진 변경"
+        message="프로필을 변경하시려면 사진을 업로드 하세요."
+        type="upload"
+        visible={uploadPopup}
+        onVisibleChange={setUploadPopup}
+        onClose={(e) => {
+          if (e.button === "confirm" && e.upload?.file) {
+            const formData = new FormData();
+            formData.append("file", e.upload?.file);
+            axios
+              .post(`${getServer()}/file/auth/upload?role=profile`, formData, {
+                headers: {
+                  Authorization: getStorage()?.login?.jwt,
+                  "Content-Type": "multipart/form-data",
+                },
+              })
+              .then(() => {
+                window.location.reload();
+              })
+              .catch((reason) => {
+                console.log(reason);
+                window.alert("프로필 사진 업로드에 실패하였습니다.");
+              });
+          } else window.alert("프로필 사진 업로드에 실패하였습니다.");
+        }}
+        upload={{
+          defaultPreview: `${getCdn()}/${getStorage()?.user?.profile!}`,
+          confirmCondition: (value) => value !== null,
         }}
       />
     </div>
