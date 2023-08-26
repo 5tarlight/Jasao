@@ -63,11 +63,10 @@ export const requestWithLogin = <T>(
   method: "get" | "post" | "patch" | "put" | "delete",
   url: string,
   data?: any | undefined,
-  headers: any | undefined = undefined
+  headers?: any | undefined
 ) =>
   new Promise<T>((resolve, reject) => {
     const storage = getStorage();
-    console.log(storage);
 
     if (storage?.login?.login) {
       request<T>(method, `${getServer()}/${url}`, data, {
