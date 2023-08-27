@@ -57,13 +57,13 @@ class UploadedFileController(
         val dbUser = this.userService.getUserById(user.id)!!
 
         if (!this.uploadedFileService.deleteProfileImage(user.id, user.profile.endsWith(".jpg"))) {
-            this.logger.warn("User ${user.id} tried to delete non-exist profile image.")
+            this.logger.warn("User ${user.id} tried to delete non-exist profile image")
             return Res(HttpResponse("File not exists", null), HttpStatus.BAD_REQUEST)
         } else {
             dbUser.profile = ""
         }
 
-        this.logger.info("User ${user.id} removed its profile image.")
+        this.logger.info("User ${user.id} removed its profile image")
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }
