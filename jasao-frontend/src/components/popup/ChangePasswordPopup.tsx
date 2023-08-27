@@ -70,11 +70,11 @@ const ChangePasswordPopup: FC<Props> = ({
         }
       }}
       confirmCondition={() => {
-        return (
-          curPw !== "" &&
-          newPw !== "" &&
-          curPw !== newPw &&
-          newPw === newPwConfirm &&
+        return !!(
+          curPw &&
+          newPw &&
+          curPw != newPw &&
+          newPw == newPwConfirm &&
           confirmCondition({ curPw, newPw })
         );
       }}
