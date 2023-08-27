@@ -354,6 +354,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
             "프로필 사진을 삭제하시겠습니까?",
             (yes) => {
               if (!yes) return;
+              sendMessage("프로필 사진 삭제", "프로필 사진을 삭제하였습니다.");
               action("remove-profile-image");
               setUploadPopup(false);
             }
