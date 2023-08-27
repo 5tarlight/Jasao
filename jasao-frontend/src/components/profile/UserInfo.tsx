@@ -24,9 +24,8 @@ type UserActionType =
   | "change-password"
   | "follow"
   | "unfollow"
-  | "add-friend"
-  | "remove-friend"
-  | "block";
+  | "block"
+  | "remove-profile-image";
 
 interface FollowRes {
   message: string;
@@ -50,9 +49,6 @@ interface Props {
 }
 
 const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
-  const [uploadPopup, setUploadPopup] = useState(false);
-  const [pwPopup, setPwPopup] = useState(false);
-  const [changePwPopup, setChangePwPopup] = useState(false);
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.username);
   const [bio, setBio] = useState(user.bio);
@@ -61,6 +57,17 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
   const [following, setFollowing] = useState<number>(0);
   const [editType, setEditType] = useState<"username" | "bio">("username");
 
+  const [uploadPopup, setUploadPopup] = useState(false);
+  const [pwPopup, setPwPopup] = useState(false);
+  const [changePwPopup, setChangePwPopup] = useState(false);
+  const [askPopup, setAskPopup] = useState({
+    visible: false,
+    title: "",
+    message: "",
+    yes: "예",
+    no: "아니요",
+    onSubmit: (value: boolean) => {},
+  });
   const [messagePopup, setMessagePopup] = useState({
     visible: false,
     title: "",
@@ -75,11 +82,22 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
     });
   };
 
+  const sendAsk = (
+    title: string,
+    message: string,
+    onSubmit: (value: boolean) => void
+  ) => {
+    setAskPopup({
+      ...askPopup,
+      title,
+      message,
+      onSubmit,
+      visible: true,
+    });
+  };
+
   const action = (type: UserActionType) => {
     switch (type) {
-      case "add-friend":
-        break;
-
       case "follow":
         if (!isFollowed) {
           requestWithLogin("post", `users/auth/follow`, {
@@ -105,6 +123,11 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         break;
 
       case "block":
+        // todo
+        break;
+
+      case "remove-profile-image":
+        // todo
         break;
     }
   };
@@ -301,6 +324,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         limitImgSizeY={imgLimit.profile.imgSizeY}
         limitFileSize={imgLimit.profile.fileSize}
         acceptExts={imgLimit.profile.exts}
+        deleteBtn
         onSubmit={(e) => {
           if (e.file === null) {
             sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
@@ -323,6 +347,17 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
               console.log(reason);
               sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
             });
+        }}
+        onDelete={() => {
+          sendAsk(
+            "프로필 사진 삭제",
+            "프로필 사진을 삭제하시겠습니까?",
+            (yes) => {
+              if (!yes) return;
+              action("remove-profile-image");
+              setUploadPopup(false);
+            }
+          );
         }}
         onError={(message) => sendMessage("오류", message)}
       />
@@ -366,6 +401,18 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           setMessagePopup({ ...messagePopup, visible: v })
         }
         button={["confirm"]}
+      />
+
+      <Popup
+        title={askPopup.title}
+        message={askPopup.message}
+        visible={askPopup.visible}
+        onVisibleChange={(v) => setAskPopup({ ...askPopup, visible: v })}
+        buttonText={{
+          confirm: askPopup.yes,
+          cancel: askPopup.no,
+        }}
+        onButtonClick={(btn) => askPopup.onSubmit(btn === "confirm")}
       />
     </div>
   );

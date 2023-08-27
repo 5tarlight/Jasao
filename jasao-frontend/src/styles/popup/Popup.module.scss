@@ -72,6 +72,20 @@
     &:disabled {
       cursor: not-allowed;
     }
+
+    background-color: $pri-light;
+
+    &:hover {
+      background-color: $pri-light-hover;
+    }
+
+    &:active {
+      background-color: $pri-light-active;
+    }
+
+    &:disabled {
+      background-color: rgb(221, 221, 221);
+    }
   }
 }
 
@@ -95,34 +109,18 @@
 }
 
 .button-cancel {
-  background-color: $dim;
+  background-color: $dim !important;
 
   &:hover {
-    background-color: $dim-hover;
+    background-color: $dim-hover !important;
   }
 
   &:active {
-    background-color: $dim-active;
+    background-color: $dim-active !important;
   }
 
   &:disabled {
-    background-color: $text-light;
-  }
-}
-
-.button-confirm {
-  background-color: $pri-light;
-
-  &:hover {
-    background-color: $pri-light-hover;
-  }
-
-  &:active {
-    background-color: $pri-light-active;
-  }
-
-  &:disabled {
-    background-color: rgb(221, 221, 221);
+    background-color: $text-light !important;
   }
 }
 
@@ -135,6 +133,9 @@
 }
 
 .filebox {
+  display: flex;
+  justify-content: center;
+
   & input[type="file"] {
     position: absolute;
     width: 0;
@@ -151,10 +152,21 @@
     margin-left: 1rem;
     font-size: 0.8rem;
   }
-
-  & .upload-input {
-    width: 60% !important;
-  }
+}
+.upload-input {
+  width: 60% !important;
+}
+.upload-button-wrapper {
+  width: 25% !important;
+  display: flex;
+  justify-content: space-evenly;
+  flex-grow: 1;
+}
+.upload-button {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 10rem;
+  margin-left: 0.5rem;
 }
 
 .margin-bot {
