@@ -8,6 +8,7 @@ import io.yeahx4.jasao.util.Res
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
@@ -47,5 +48,22 @@ class UploadedFileController(
 
             Res(HttpResponse("Invalid role", null), HttpStatus.BAD_REQUEST)
         }
+    }
+
+    @DeleteMapping("/auth/profile/delete")
+    @Transactional
+    fun deleteProfileImage(@RequestHeader("Authorization") jwt: String): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt);
+        val dbUser = this.userService.getUserById(user.id)!!
+
+        if (!this.uploadedFileService.deleteProfileImage(user.id, user.profile.endsWith(".jpg"))) {
+            this.logger.warn("User ${user.id} tried to delete non-exist profile image.")
+            return Res(HttpResponse("File not exists", null), HttpStatus.BAD_REQUEST)
+        } else {
+            dbUser.profile = ""
+        }
+
+        this.logger.info("User ${user.id} removed its profile image.")
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }

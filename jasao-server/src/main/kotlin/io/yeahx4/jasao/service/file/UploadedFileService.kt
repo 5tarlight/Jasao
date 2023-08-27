@@ -43,4 +43,23 @@ class UploadedFileService(private val uploadedFileRepository: UploadedFileReposi
 
         return "/images/${owner}/profile${ext}"
     }
+
+    fun deleteProfileImage(user: Long, isJgp: Boolean): Boolean {
+        val path = arrayOf(
+            System.getProperty("user.dir"),
+            "..",
+            "cdn",
+            "public",
+            "images",
+            user.toString(),
+            "profile" + (if (isJgp) ".jpg" else ".png")
+        ).joinToString(File.separator)
+        val file = File(path)
+
+        return if (!file.exists()) {
+            false
+        } else {
+            file.delete()
+        }
+    }
 }
