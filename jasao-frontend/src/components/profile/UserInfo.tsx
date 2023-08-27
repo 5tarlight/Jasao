@@ -140,6 +140,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
 
   useEffect(() => {
     setUsername(user.username);
+    setBio(user.bio);
   }, [user]);
 
   const edit = (type: "username" | "bio", value: string) => {
@@ -191,7 +192,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           editable={isMine}
           multiline
           rows={3}
-          defaultValue="bio..."
+          defaultValue={isMine ? "bio..." : ""}
         />
         <div className={cx("info-value-container")}>
           <div>{following} 팔로잉</div>
