@@ -10,7 +10,7 @@ import Logout from "./pages/auth/Logout";
 import Test from "./pages/test";
 import Footer from "./components/footer/Footer";
 import ViewProfile from "./pages/user/ViewProfile";
-import PopupTest from "./pages/popupTest";
+import NewPopupTest from "./pages/newPopupTest";
 
 const cx = classNames.bind(styles);
 
@@ -29,7 +29,7 @@ function App() {
           <Route path="/user/:id" element={<ViewProfile />} />
 
           <Route path="/test/upload" element={<Test />} />
-          <Route path="/test/popup" element={<PopupTest />} />
+          <Route path="/test/popup" element={<NewPopupTest />} />
 
           <Route path="/*" element={<NotFound />} />
         </Routes>

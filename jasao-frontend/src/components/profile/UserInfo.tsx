@@ -12,13 +12,16 @@ import {
   requestWithLogin,
 } from "../../util/server";
 import { User } from "../../util/user";
-import Popup from "../popup/Popup";
 import axios from "axios";
+import InputPopup from "../popup/InputPopup";
+import UploadFilePopup from "../popup/UploadFilePopup";
+import Popup from "../popup/Popup";
+import ChangePasswordPopup from "../popup/ChangePasswordPopup";
 
 const cx = classNames.bind(styles);
 
 type UserActionType =
-  | "edit-profile"
+  | "change-password"
   | "follow"
   | "unfollow"
   | "add-friend"
@@ -49,6 +52,7 @@ interface Props {
 const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
   const [uploadPopup, setUploadPopup] = useState(false);
   const [pwPopup, setPwPopup] = useState(false);
+  const [changePwPopup, setChangePwPopup] = useState(false);
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.username);
   const [bio, setBio] = useState(user.bio);
@@ -96,7 +100,8 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         }
         break;
 
-      case "edit-profile":
+      case "change-password":
+        setChangePwPopup(true);
         break;
 
       case "block":
@@ -215,9 +220,9 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           <button
             className={cx("info-button", "info-button-1")}
             hidden={!isMine}
-            onClick={() => action("edit-profile")}
+            onClick={() => action("change-password")}
           >
-            프로필 수정
+            비밀번호 변경
           </button>
         ) : (
           <>
@@ -236,101 +241,120 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           차단
         </div>
       ) : undefined}
-      <Popup
-        type="input"
+
+      <InputPopup
         title="비밀번호를 입력하세요."
         visible={pwPopup}
         onVisibleChange={setPwPopup}
-        input={{
-          type: "password",
-          confirmCondition: (value) => validate("password", value),
+        inputType="password"
+        confirmCondition={(e) => validate("password", e.value)}
+        onCancel={() => {
+          if (editType === "username") setUsername(user.username);
+          if (editType === "bio") setBio(user.bio);
         }}
-        onClose={(e) => {
-          if (e.button === "confirm") {
-            const storage = getStorage();
-            const showMessage = (message: string) => {
-              sendMessage("오류", message);
-              if (editType === "username") setUsername(user.username);
-              if (editType === "bio") setBio(user.bio);
-            };
-            let data;
-
-            if (
-              editType === "username" &&
-              validate("username", temp, showMessage)
-            )
-              data = { username: temp };
-            else if (editType === "bio" && validate("bio", temp, showMessage))
-              data = { bio: temp };
-            else return;
-
-            request(
-              "patch",
-              `${getServer()}/user/auth/update`,
-              {
-                oldPassword: e.input?.value,
-                ...data,
-              },
-              {
-                Authorization: storage?.login?.jwt,
-              }
-            )
-              .then(() => {
-                if (editType === "username") user.username = temp;
-                if (editType === "bio") user.bio = temp;
-              })
-              .catch(() => {
-                sendMessage(
-                  "오류",
-                  `${
-                    editType === "username" ? "닉네임" : "bio"
-                  } 변경에 실패하였습니다.`
-                );
-                if (editType === "username") setUsername(user.username);
-                if (editType === "bio") setBio(user.bio);
-              });
-          } else {
+        onSubmit={(e) => {
+          const showMessage = (message: string) => {
+            sendMessage("오류", message);
             if (editType === "username") setUsername(user.username);
             if (editType === "bio") setBio(user.bio);
-          }
+          };
+          let data;
+
+          if (
+            editType === "username" &&
+            validate("username", temp, showMessage)
+          )
+            data = { username: temp };
+          else if (editType === "bio" && validate("bio", temp, showMessage))
+            data = { bio: temp };
+          else return;
+
+          requestWithLogin("patch", `user/auth/update`, {
+            oldPassword: e.value,
+            ...data,
+          })
+            .then(() => {
+              if (editType === "username") user.username = temp;
+              if (editType === "bio") user.bio = temp;
+            })
+            .catch(() => {
+              sendMessage(
+                "오류",
+                `${
+                  editType === "username" ? "닉네임" : "bio"
+                } 변경에 실패하였습니다.`
+              );
+              if (editType === "username") setUsername(user.username);
+              if (editType === "bio") setBio(user.bio);
+            });
         }}
       />
-      <Popup
+      <UploadFilePopup
         title="프로필 사진 변경"
         message="프로필을 변경하시려면 사진을 업로드 하세요."
-        type="upload"
         visible={uploadPopup}
         onVisibleChange={setUploadPopup}
-        onClose={(e) => {
-          if (e.button === "confirm" && e.upload?.file) {
-            const formData = new FormData();
-            formData.append("file", e.upload?.file);
-            axios
-              .post(`${getServer()}/file/auth/upload?role=profile`, formData, {
-                headers: {
-                  Authorization: getStorage()?.login?.jwt,
-                  "Content-Type": "multipart/form-data",
-                },
-              })
-              .then(() => {
-                window.location.reload();
-              })
-              .catch((reason) => {
-                console.log(reason);
-                sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
-              });
-          } else if (e.button !== "cancel")
+        defaultPreview={`${getCdn()}/${getStorage()?.user?.profile!}`}
+        confirmCondition={(value) => value !== null}
+        limitImgSizeX={imgLimit.profile.imgSizeX}
+        limitImgSizeY={imgLimit.profile.imgSizeY}
+        limitFileSize={imgLimit.profile.fileSize}
+        acceptExts={imgLimit.profile.exts}
+        onSubmit={(e) => {
+          if (e.file === null) {
             sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
-        }}
-        upload={{
-          defaultPreview: `${getCdn()}/${getStorage()?.user?.profile!}`,
-          confirmCondition: (value) => value !== null,
-          imgSizeXLimit: imgLimit.profile.imgSizeX,
-          imgSizeYLimit: imgLimit.profile.imgSizeY,
-          sizeLimit: imgLimit.profile.fileSize,
-          exts: imgLimit.profile.exts,
+            return;
+          }
+
+          const formData = new FormData();
+          formData.append("file", e.file);
+          axios
+            .post(`${getServer()}/file/auth/upload?role=profile`, formData, {
+              headers: {
+                Authorization: getStorage()?.login?.jwt,
+                "Content-Type": "multipart/form-data",
+              },
+            })
+            .then(() => {
+              window.location.reload();
+            })
+            .catch((reason) => {
+              console.log(reason);
+              sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
+            });
         }}
         onError={(message) => sendMessage("오류", message)}
+      />
+      <ChangePasswordPopup
+        title="비밀번호 변경"
+        visible={changePwPopup}
+        onVisibleChange={setChangePwPopup}
+        onSubmit={(e) => {
+          if (
+            validate("password", e.curPw, (m) => sendMessage("오류", m)) &&
+            validate("password", e.newPw, (m) => sendMessage("오류", m))
+          ) {
+            requestWithLogin("patch", `user/auth/update`, {
+              oldPassword: e.curPw,
+              password: e.newPw,
+            })
+              .then(() =>
+                sendMessage("비밀번호 변경", "비밀번호를 변경하였습니다.")
+              )
+              .catch((reason) => {
+                if (`${reason}`.includes("403"))
+                  sendMessage(
+                    "오류",
+                    `비밀번호 변경에 실패하였습니다.\n비밀번호를 확인하시기 바랍니다.`
+                  );
+                else
+                  sendMessage(
+                    "오류",
+                    `비밀번호 변경에 실패하였습니다.\n${reason}`
+                  );
+              });
+          }
+        }}
       />
 
       <Popup

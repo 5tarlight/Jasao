@@ -40,6 +40,39 @@
     0px 0px 9px rgba(0, 0, 0, 0.028), 0px 0px 12.8px rgba(0, 0, 0, 0.031),
     0px 0px 18.6px rgba(0, 0, 0, 0.034), 0px 0px 28.7px rgba(0, 0, 0, 0.039),
     0px 0px 51px rgba(0, 0, 0, 0.05);
+
+  & input {
+    transition: border 0.25s;
+
+    padding: 0.5rem;
+    border-radius: 4px;
+    width: 100%;
+    outline: none;
+    border: 1px solid black;
+
+    &:focus {
+      outline: none;
+      border: 1px solid $pri;
+    }
+  }
+
+  & button {
+    transition: background-color 0.3s;
+    padding: 7px 40px 7px 40px;
+
+    border-radius: 4px;
+    border: none;
+    outline: none;
+    user-select: none;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+  }
 }
 
 .title {
@@ -48,24 +81,10 @@
   margin-bottom: 0.7rem;
 }
 
-.input {
-  transition: border 0.1s;
-
-  padding: 0.5rem;
-  border-radius: 4px;
-  width: 100%;
-  outline: none;
-  border: 1px solid black;
-
-  &:focus {
-    outline: none;
-    border: 1px solid $pri;
-  }
-}
-
 .message {
   word-wrap: break-word;
   width: 100%;
+  white-space: pre-wrap;
 }
 
 .button-wrapper {
@@ -75,59 +94,35 @@
   margin-top: 1rem;
 }
 
-.button {
-  transition: background-color 0.2s;
-  padding: 7px 40px 7px 40px;
-
-  border-radius: 4px;
-  border: none;
-  outline: none;
-  user-select: none;
-
-  &:hover {
-    cursor: pointer;
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-  }
-}
-
 .button-cancel {
   background-color: $dim;
+
   &:hover {
-    background-color: $dim-hover !important;
+    background-color: $dim-hover;
   }
 
   &:active {
-    background-color: $dim-active !important;
+    background-color: $dim-active;
   }
 
-  // &:enabled {
-  //   background-color: $dim;
-  // }
-
   &:disabled {
-    background-color: $text-light !important;
+    background-color: $text-light;
   }
 }
 
 .button-confirm {
   background-color: $pri-light;
+
   &:hover {
-    background-color: $pri-light-hover !important;
+    background-color: $pri-light-hover;
   }
 
   &:active {
-    background-color: $pri-light-active !important;
+    background-color: $pri-light-active;
   }
 
-  // &:enabled {
-  //   background-color: $pri-light;
-  // }
-
   &:disabled {
-    background-color: rgb(221, 221, 221) !important;
+    background-color: rgb(221, 221, 221);
   }
 }
 
@@ -160,4 +155,8 @@
   & .upload-input {
     width: 60% !important;
   }
+}
+
+.margin-bot {
+  margin-bottom: 0.5rem;
 }
