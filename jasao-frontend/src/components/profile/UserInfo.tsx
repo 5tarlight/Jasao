@@ -15,7 +15,7 @@ import { User } from "../../util/user";
 import axios from "axios";
 import InputPopup from "../popup/InputPopup";
 import UploadFilePopup from "../popup/UploadFilePopup";
-import Popup from "../popup/Popup";
+import Popup, { buttonType } from "../popup/Popup";
 import ChangePasswordPopup from "../popup/ChangePasswordPopup";
 
 const cx = classNames.bind(styles);
@@ -46,9 +46,10 @@ interface Props {
   user: User;
   isMine: boolean;
   myId: number | undefined;
+  reloadUser: () => void;
 }
 
-const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
+const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
   const [temp, setTemp] = useState("");
   const [username, setUsername] = useState(user.username);
   const [bio, setBio] = useState(user.bio);
@@ -68,17 +69,28 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
     no: "아니요",
     onSubmit: (value: boolean) => {},
   });
-  const [messagePopup, setMessagePopup] = useState({
+  const [messagePopup, setMessagePopup] = useState<{
+    visible: boolean;
+    title: string;
+    message: string;
+    callback: ((btn: buttonType) => void) | undefined;
+  }>({
     visible: false,
     title: "",
     message: "",
+    callback: undefined,
   });
 
-  const sendMessage = (title: string, message: string) => {
+  const sendMessage = (
+    title: string,
+    message: string,
+    callback?: (btn: buttonType) => void
+  ) => {
     setMessagePopup({
       title,
       message,
       visible: true,
+      callback,
     });
   };
 
@@ -127,7 +139,9 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         break;
 
       case "remove-profile-image":
-        // todo
+        requestWithLogin("delete", "file/auth/profile/delete");
+        // .then((res) => console.log(res))
+        // .catch((reason) => console.log(reason));
         break;
     }
   };
@@ -319,16 +333,14 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         visible={uploadPopup}
         onVisibleChange={setUploadPopup}
         defaultPreview={
-          user.profile
-            ? `${getCdn()}/${getStorage()?.user?.profile!}`
-            : "/person.svg"
+          user.profile ? `${getCdn()}/${user.profile}` : "/person.svg"
         }
         confirmCondition={(value) => value !== null}
         limitImgSizeX={imgLimit.profile.imgSizeX}
         limitImgSizeY={imgLimit.profile.imgSizeY}
         limitFileSize={imgLimit.profile.fileSize}
         acceptExts={imgLimit.profile.exts}
-        deleteBtn
+        deleteBtn={!!user.profile}
         onSubmit={(e) => {
           if (e.file === null) {
             sendMessage("오류", "프로필 사진 업로드에 실패하였습니다.");
@@ -345,6 +357,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
               },
             })
             .then(() => {
+              reloadUser();
               window.location.reload();
             })
             .catch((reason) => {
@@ -358,7 +371,14 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
             "프로필 사진을 삭제하시겠습니까?",
             (yes) => {
               if (!yes) return;
-              sendMessage("프로필 사진 삭제", "프로필 사진을 삭제하였습니다.");
+              sendMessage(
+                "프로필 사진 삭제",
+                "프로필 사진을 삭제하였습니다.",
+                () => {
+                  reloadUser();
+                  window.location.reload();
+                }
+              );
               action("remove-profile-image");
               setUploadPopup(false);
             }
@@ -406,6 +426,9 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
           setMessagePopup({ ...messagePopup, visible: v })
         }
         button={["confirm"]}
+        onButtonClick={(btn) => {
+          if (messagePopup.callback) messagePopup.callback(btn);
+        }}
       />
 
       <Popup
