@@ -1,7 +1,9 @@
 package io.yeahx4.jasao.controller.user
 
+import io.yeahx4.jasao.dto.user.BlockDto
 import io.yeahx4.jasao.dto.user.FollowDto
 import io.yeahx4.jasao.dto.user.FollowResDto
+import io.yeahx4.jasao.service.user.BlockUserService
 import io.yeahx4.jasao.service.user.FollowingService
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.service.user.UserService
@@ -25,7 +27,8 @@ import org.springframework.web.bind.annotation.RestController
 class UserCommunityController(
     private val followingService: FollowingService,
     private val jwtService: JwtService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val blockUserService: BlockUserService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -103,5 +106,17 @@ class UserCommunityController(
     ): Boolean {
         val me = this.jwtService.getUserFromToken(jwt);
         return this.followingService.isUserFollow(me.id, target);
+    }
+
+    @PostMapping("/auth/block")
+    fun blockUser(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestBody blockDto: BlockDto
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        this.blockUserService.block(user.id, blockDto.target)
+
+        this.logger.info("User ${user.id} blocks ${blockDto.target}")
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }
