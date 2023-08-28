@@ -201,7 +201,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
 
   useEffect(() => {
     refreshIsBlocking();
-  }, [setIsBlocked, user.id]);
+  }, [setIsBlocked, user.id, refreshIsBlocking]);
 
   useEffect(() => {
     setUsername(user.username);
