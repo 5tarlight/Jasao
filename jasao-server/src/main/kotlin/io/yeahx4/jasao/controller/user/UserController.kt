@@ -266,6 +266,7 @@ class UserController(
         val user = this.userService.getUserById(id)
             ?: return Res(HttpResponse("Not Found", null), HttpStatus.NOT_FOUND)
 
+        this.logger.info("User ${id} profile request")
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
 
@@ -273,6 +274,7 @@ class UserController(
     fun getMyProfile(@RequestHeader("Authorization") jwt: String): Res<UserDto> {
         val user = this.jwtService.getUserFromToken(jwt)
 
+        this.logger.info("User ${user.id} self identification")
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
 }
