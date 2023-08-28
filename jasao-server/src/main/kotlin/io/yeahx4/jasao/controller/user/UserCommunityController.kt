@@ -111,12 +111,14 @@ class UserCommunityController(
     }
 
     @PostMapping("/auth/block")
+    @Transactional
     fun blockUser(
         @RequestHeader("Authorization") jwt: String,
         @RequestBody blockDto: BlockDto
     ): Res<String> {
         val user = this.jwtService.getUserFromToken(jwt)
         this.blockUserService.block(user.id, blockDto.target)
+        this.followingService.unfollow(user.id, blockDto.target)
 
         this.logger.info("User ${user.id} blocks ${blockDto.target}")
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
