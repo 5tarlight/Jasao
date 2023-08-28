@@ -11,6 +11,7 @@ import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.Res
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
+import org.springframework.cglib.core.Block
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
@@ -133,14 +134,15 @@ class UserCommunityController(
     }
 
     @DeleteMapping("/auth/unblock")
+    @Transactional
     fun unblock(
         @RequestHeader("Authorization") jwt: String,
-        @RequestBody unblockDto: BlockDto
+        @RequestParam target: Long
     ): Res<String> {
         val user = this.jwtService.getUserFromToken(jwt)
-        this.blockUserService.unblock(user.id, unblockDto.target)
+        this.blockUserService.unblock(user.id, target)
 
-        this.logger.info("User ${user.id} unblocks user ${unblockDto.target}")
+        this.logger.info("User ${user.id} unblocks user ${target}")
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }
