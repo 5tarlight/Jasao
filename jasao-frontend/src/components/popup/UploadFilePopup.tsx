@@ -34,6 +34,8 @@ interface Props {
   limitFileSize?: number;
   onError?: (message: string) => void;
   acceptExts?: string;
+  deleteBtn?: boolean;
+  onDelete?: () => void;
 }
 
 const UploadFilePopup: FC<Props> = ({
@@ -56,6 +58,8 @@ const UploadFilePopup: FC<Props> = ({
   limitImgSizeY,
   onError,
   acceptExts,
+  deleteBtn = false,
+  onDelete = () => {},
 }) => {
   const [file, setFile] = useState<File | null>(defaultFile);
   const [img, setImg] = useState<any>(defaultPreview);
@@ -117,8 +121,8 @@ const UploadFilePopup: FC<Props> = ({
           src={img}
           alt="preview upload"
           className={cx("upload-preview")}
-          onLoad={(e) => setError(false)}
-          onError={(e) => setError(true)}
+          onLoad={(_) => setError(false)}
+          onError={(_) => setError(true)}
           hidden={error}
         ></img>
         <div className={cx("filebox")}>
@@ -128,9 +132,22 @@ const UploadFilePopup: FC<Props> = ({
             readOnly
             placeholder="첨부파일"
           />
-          <label className={cx("button", "button-confirm")} htmlFor="file">
-            찾기
-          </label>
+          <div className={cx("upload-button-wrapper")}>
+            <button
+              className={cx("upload-button")}
+              onClick={() => inputRef.current?.click()}
+            >
+              찾기
+            </button>
+            {deleteBtn ? (
+              <button
+                className={cx("upload-button")}
+                onClick={() => onDelete()}
+              >
+                삭제
+              </button>
+            ) : undefined}
+          </div>
           <input
             ref={inputRef}
             type="file"

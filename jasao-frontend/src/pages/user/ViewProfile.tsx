@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import styles from "../../styles/profile/Profile.module.scss";
 import classNames from "classnames/bind";
 import { useNavigate, useParams } from "react-router-dom";
@@ -19,7 +19,7 @@ const ViewProfile: FC = () => {
 
   const isMine = () => myId === targetId;
 
-  useEffect(() => {
+  const reloadUser = useCallback(() => {
     const storage = getStorage();
     setMyId(storage?.user?.id);
 
@@ -32,12 +32,21 @@ const ViewProfile: FC = () => {
       });
   }, [targetId, nav]);
 
+  useEffect(() => {
+    reloadUser();
+  }, [reloadUser, targetId, nav]);
+
   return (
     <>
       {userData ? (
         <div className={cx("contatiner")}>
           <div className={cx("info")}>
-            <UserInfo user={userData} isMine={isMine()} myId={myId} />
+            <UserInfo
+              user={userData}
+              isMine={isMine()}
+              myId={myId}
+              reloadUser={reloadUser}
+            />
           </div>
           <div className={cx("content")}>
             <FollowInfo targetId={targetId} />
