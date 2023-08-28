@@ -8,6 +8,9 @@ import Login from "./pages/auth/Login";
 import SignUp from "./pages/auth/SignUp";
 import Logout from "./pages/auth/Logout";
 import Test from "./pages/test";
+import Footer from "./components/footer/Footer";
+import ViewProfile from "./pages/user/ViewProfile";
+import NewPopupTest from "./pages/newPopupTest";
 
 const cx = classNames.bind(styles);
 
@@ -23,11 +26,15 @@ function App() {
           <Route path="/auth/signup" element={<SignUp />} />
           <Route path="/auth/logout" element={<Logout />} />
 
-          <Route path="/test" element={<Test />} />
+          <Route path="/user/:id" element={<ViewProfile />} />
+
+          <Route path="/test/upload" element={<Test />} />
+          <Route path="/test/popup" element={<NewPopupTest />} />
 
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </div>
+      <Footer />
     </BrowserRouter>
   );
 }

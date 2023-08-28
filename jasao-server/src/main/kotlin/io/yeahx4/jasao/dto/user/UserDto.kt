@@ -19,7 +19,7 @@ data class UserDto(
     val username: String,
     val role: UserRole,
     val profile: String,
-    val bio: String
+    val bio: String,
 ) {
     fun toLoginRes(token: String): LoginResDto {
         return LoginResDto(
@@ -47,6 +47,7 @@ data class LoginResDto(
 data class UpdateUserDto(
     val username: String?,
     val password: String?,
+    val bio: String?,
     val oldPassword: String
 )
 

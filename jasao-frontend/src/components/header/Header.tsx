@@ -13,7 +13,6 @@ import HeaderLogin from "./HeaderLogin";
 import axios from "axios";
 import { getServer, request } from "../../util/server";
 import LoginHeader from "./LoginHeader";
-import ProfileImage from "../ProfileImage";
 
 const cx = classNames.bind(styles);
 

@@ -1,4 +1,4 @@
-export type authType = "email" | "username" | "password";
+export type authType = "email" | "username" | "password" | "bio";
 
 export const emailRe = new RegExp("^[\\w]+@([\\w-\\.]+\\.)+[\\w]{2,4}$");
 export const usernameRe = new RegExp("[\\w|ㄱ-ㅎ가-힣]");
@@ -60,6 +60,21 @@ export const validate = (
         return false;
       }
       break;
+
+    case "bio":
+      if (value.length > 255) {
+        setWarn("너무 길어요!!!!");
+        return false;
+      }
   }
   return true;
+};
+
+export const imgLimit = {
+  profile: {
+    imgSizeX: 1024,
+    imgSizeY: 1024,
+    fileSize: 5 * 1024 * 1024,
+    exts: "image/jpeg, image/png",
+  },
 };

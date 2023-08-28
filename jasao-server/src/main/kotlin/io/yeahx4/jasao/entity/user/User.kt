@@ -1,15 +1,19 @@
 package io.yeahx4.jasao.entity.user
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import io.yeahx4.jasao.dto.user.UserDto
 import io.yeahx4.jasao.entity.TimeEntity
 import io.yeahx4.jasao.role.user.UserRole
+import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
+import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import lombok.Setter
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -55,7 +59,7 @@ class User(
             this.username,
             this.role,
             this.profile,
-            this.bio
+            this.bio,
         )
     }
 

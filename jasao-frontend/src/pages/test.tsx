@@ -25,11 +25,13 @@ const Test: FC = () => {
           />
           <button
             onClick={async () => {
+              console.log(fileData);
               if (!fileData) return;
 
               const formData = new FormData();
               formData.append("file", fileData);
-
+              console.log(formData);
+              console.log(fileData);
               const res = await axios.post(
                 `${getServer()}/file/auth/upload?role=profile`,
                 formData,

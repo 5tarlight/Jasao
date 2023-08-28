@@ -138,6 +138,11 @@ class UserController(
             tUser.setEncryptedPassword(this.userService.encrypt(dto.password))
         }
 
+        if (dto.bio != null) {
+            logger.info("Update user  ${user.getRealUsername()}(${user.id})'s bio")
+            tUser.bio = dto.bio
+        }
+
         return Res(HttpResponse("Success", null), HttpStatus.OK)
     }
 
@@ -256,20 +261,12 @@ class UserController(
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 
-//    @PostMapping("/picture")
-//    fun uploadPicture(
-//        @RequestHeader("Authorization") jwt: String,
-//        @RequestBody file: MultipartFile
-//    ): String {
-//        val user = this.jwtService.getUserFromToken(jwt)
-//        return this.userService.savePicture(user.id, file)
-//    }
-
     @GetMapping("/id")
     fun getUserById(@RequestParam id: Long): Res<UserDto> {
         val user = this.userService.getUserById(id)
             ?: return Res(HttpResponse("Not Found", null), HttpStatus.NOT_FOUND)
 
+        this.logger.info("User ${id} profile request")
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
 
@@ -277,6 +274,7 @@ class UserController(
     fun getMyProfile(@RequestHeader("Authorization") jwt: String): Res<UserDto> {
         val user = this.jwtService.getUserFromToken(jwt)
 
+        this.logger.info("User ${user.id} self identification")
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
 }

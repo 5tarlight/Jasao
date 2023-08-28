@@ -1,0 +1,41 @@
+@import "Constant.scss";
+.tabpage {
+  .tabpage-tab {
+    display: flex;
+    flex-grow: 1;
+    margin-bottom: 0.2rem;
+
+    .tabpage-tab-item {
+      transition: background-color 0.3s, border-bottom 0.3s;
+
+      padding: 0.5rem;
+      margin: 0.2rem;
+      width: 100%;
+      user-select: none;
+      text-align: center;
+      background-color: $white;
+      border-bottom: 3px solid $white;
+
+      &:hover {
+        background-color: $white-hover;
+        border-bottom-color: $white-hover;
+        cursor: pointer;
+      }
+
+      &:active {
+        background-color: $white-active;
+        border-bottom-color: $white-active;
+      }
+    }
+
+    .tabpage-tab-item-enable {
+      border-bottom: 3px solid $pri !important;
+    }
+  }
+
+  .tabpage-page {
+    height: 100%;
+
+    padding: 0.2rem;
+  }
+}

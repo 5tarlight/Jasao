@@ -1,0 +1,175 @@
+@import "../Constant.scss";
+
+.popup-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+@keyframes scale-up-center {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.popup-box {
+  animation: scale-up-center 0.6s both;
+  position: relative;
+  min-width: 400px;
+  min-height: 120px;
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 5px;
+
+  box-shadow: 0px 0px 0.8px rgba(0, 0, 0, 0.011),
+    0px 0px 1.8px rgba(0, 0, 0, 0.016), 0px 0px 2.9px rgba(0, 0, 0, 0.019),
+    0px 0px 4.4px rgba(0, 0, 0, 0.022), 0px 0px 6.4px rgba(0, 0, 0, 0.025),
+    0px 0px 9px rgba(0, 0, 0, 0.028), 0px 0px 12.8px rgba(0, 0, 0, 0.031),
+    0px 0px 18.6px rgba(0, 0, 0, 0.034), 0px 0px 28.7px rgba(0, 0, 0, 0.039),
+    0px 0px 51px rgba(0, 0, 0, 0.05);
+
+  & input {
+    transition: border 0.25s;
+
+    padding: 0.5rem;
+    border-radius: 4px;
+    width: 100%;
+    outline: none;
+    border: 1px solid black;
+
+    &:focus {
+      outline: none;
+      border: 1px solid $pri;
+    }
+  }
+
+  & button {
+    transition: background-color 0.3s;
+    padding: 7px 0 7px 0;
+    width: 7rem;
+
+    border-radius: 4px;
+    border: none;
+    outline: none;
+    user-select: none;
+
+    &:hover {
+      cursor: pointer;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+    }
+
+    background-color: $pri-light;
+
+    &:hover {
+      background-color: $pri-light-hover;
+    }
+
+    &:active {
+      background-color: $pri-light-active;
+    }
+
+    &:disabled {
+      background-color: rgb(221, 221, 221);
+    }
+  }
+}
+
+.title {
+  font-size: 1.25rem;
+  user-select: none;
+  margin-bottom: 0.7rem;
+}
+
+.message {
+  word-wrap: break-word;
+  width: 100%;
+  white-space: pre-wrap;
+}
+
+.button-wrapper {
+  display: flex;
+  justify-content: space-evenly;
+
+  margin-top: 1rem;
+}
+
+.button-cancel {
+  background-color: $dim !important;
+
+  &:hover {
+    background-color: $dim-hover !important;
+  }
+
+  &:active {
+    background-color: $dim-active !important;
+  }
+
+  &:disabled {
+    background-color: $text-light !important;
+  }
+}
+
+.upload-preview {
+  width: 17rem;
+  height: 17rem;
+
+  border-radius: 50%;
+  border: 2px solid $dim;
+}
+
+.filebox {
+  display: flex;
+  justify-content: center;
+
+  & input[type="file"] {
+    position: absolute;
+    width: 0;
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+  }
+
+  & label[for="file"] {
+    display: inline-block;
+    padding: 0.5rem !important;
+    width: 5rem;
+    margin-left: 1rem;
+    font-size: 0.8rem;
+  }
+}
+.upload-input {
+  width: 60% !important;
+}
+.upload-button-wrapper {
+  width: 25% !important;
+  display: flex;
+  justify-content: space-evenly;
+  flex-grow: 1;
+}
+.upload-button {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  width: 10rem;
+  margin-left: 0.5rem;
+}
+
+.margin-bot {
+  margin-bottom: 0.5rem;
+}

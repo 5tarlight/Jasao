@@ -1,0 +1,33 @@
+@import "../Constant.scss";
+
+.footer {
+  width: 100%;
+  height: 64px;
+  line-height: 64px;
+  display: flex;
+  justify-content: center;
+}
+
+.footer-content {
+  max-width: 1024px;
+  width: 100%;
+  display: flex;
+  height: 100%;
+  line-height: 64px;
+  justify-content: space-between;
+  user-select: none;
+}
+
+.footer-links {
+  display: flex;
+  justify-content: space-between;
+}
+
+.footer-link {
+  margin-left: 2rem;
+
+  &:hover {
+    color: $link;
+    text-decoration: underline;
+  }
+}
