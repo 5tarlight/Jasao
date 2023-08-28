@@ -25,6 +25,7 @@ type UserActionType =
   | "follow"
   | "unfollow"
   | "block"
+  | "unblock"
   | "remove-profile-image";
 
 interface FollowRes {
@@ -54,6 +55,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
   const [username, setUsername] = useState(user.username);
   const [bio, setBio] = useState(user.bio);
   const [isFollowed, setIsFollowed] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
   const [followed, setFollowed] = useState<number>(0);
   const [following, setFollowing] = useState<number>(0);
   const [editType, setEditType] = useState<"username" | "bio">("username");
@@ -135,7 +137,15 @@ const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
         break;
 
       case "block":
-        // todo
+        requestWithLogin("post", "users/auth/block", { target: user.id }).then(
+          () => refreshIsBlocking()
+        );
+        break;
+
+      case "unblock":
+        requestWithLogin("delete", `users/auth/unblock?target=${user.id}`)
+          .then(() => refreshIsBlocking())
+          .catch((r) => console.log(r));
         break;
 
       case "remove-profile-image":
@@ -162,6 +172,15 @@ const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
     [user.id]
   );
 
+  const refreshIsBlocking = useCallback(() => {
+    requestWithLogin<{ message: string; data: boolean }>(
+      "get",
+      `users/auth/isblocking?target=${user.id}`
+    )
+      .then((res) => setIsBlocked(res.data))
+      .catch((reason) => console.log(reason));
+  }, [setIsBlocked, user.id]);
+
   useEffect(() => {
     refreshFollowList("followed");
   }, [setFollowed, user.id, refreshFollowList]);
@@ -179,6 +198,10 @@ const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
       .then((r) => setIsFollowed(r))
       .catch((reason) => console.log(reason));
   }, [user.id, setIsFollowed, followed]);
+
+  useEffect(() => {
+    refreshIsBlocking();
+  }, [setIsBlocked, user.id]);
 
   useEffect(() => {
     setUsername(user.username);
@@ -275,8 +298,11 @@ const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
         )}
       </div>
       {!isMine ? (
-        <div className={cx("info-block")} onClick={() => action("block")}>
-          차단
+        <div
+          className={cx("info-block")}
+          onClick={() => action(isBlocked ? "unblock" : "block")}
+        >
+          {isBlocked ? "차단 해제" : "차단"}
         </div>
       ) : undefined}
 
