@@ -1,7 +1,9 @@
 package io.yeahx4.jasao.controller.user
 
+import io.yeahx4.jasao.dto.user.BlockDto
 import io.yeahx4.jasao.dto.user.FollowDto
 import io.yeahx4.jasao.dto.user.FollowResDto
+import io.yeahx4.jasao.service.user.BlockUserService
 import io.yeahx4.jasao.service.user.FollowingService
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.service.user.UserService
@@ -12,6 +14,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -25,7 +28,8 @@ import org.springframework.web.bind.annotation.RestController
 class UserCommunityController(
     private val followingService: FollowingService,
     private val jwtService: JwtService,
-    private val userService: UserService
+    private val userService: UserService,
+    private val blockUserService: BlockUserService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -103,5 +107,40 @@ class UserCommunityController(
     ): Boolean {
         val me = this.jwtService.getUserFromToken(jwt);
         return this.followingService.isUserFollow(me.id, target);
+    }
+
+    @PostMapping("/auth/block")
+    fun blockUser(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestBody blockDto: BlockDto
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        this.blockUserService.block(user.id, blockDto.target)
+
+        this.logger.info("User ${user.id} blocks ${blockDto.target}")
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
+    }
+
+    @GetMapping("/auth/isblocking")
+    fun isBlocking(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestParam target: Long
+    ): Res<Boolean> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        val isBlocking = this.blockUserService.isBlocking(user.id, target)
+
+        return Res(HttpResponse("Ok", isBlocking), HttpStatus.OK)
+    }
+
+    @DeleteMapping("/auth/unblock")
+    fun unblock(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestBody unblockDto: BlockDto
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        this.blockUserService.unblock(user.id, unblockDto.target)
+
+        this.logger.info("User ${user.id} unblocks user ${unblockDto.target}")
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }
