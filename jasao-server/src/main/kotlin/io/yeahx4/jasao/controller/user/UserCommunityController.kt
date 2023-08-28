@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -118,5 +119,16 @@ class UserCommunityController(
 
         this.logger.info("User ${user.id} blocks ${blockDto.target}")
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
+    }
+
+    @GetMapping("/auth/isblocking")
+    fun isBlocking(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestParam target: Long
+    ): Res<Boolean> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        val isBlocking = this.blockUserService.isBlocking(user.id, target)
+
+        return Res(HttpResponse("Ok", isBlocking), HttpStatus.OK)
     }
 }
