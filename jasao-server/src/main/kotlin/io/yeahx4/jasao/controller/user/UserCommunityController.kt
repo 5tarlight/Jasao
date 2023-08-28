@@ -131,4 +131,16 @@ class UserCommunityController(
 
         return Res(HttpResponse("Ok", isBlocking), HttpStatus.OK)
     }
+
+    @DeleteMapping("/auth/unblock")
+    fun unblock(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestBody unblockDto: BlockDto
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        this.blockUserService.unblock(user.id, unblockDto.target)
+
+        this.logger.info("User ${user.id} unblocks user ${unblockDto.target}")
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
+    }
 }
