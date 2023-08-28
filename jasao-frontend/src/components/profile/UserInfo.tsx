@@ -318,7 +318,11 @@ const UserInfo: FC<Props> = ({ user, isMine, myId }) => {
         message="프로필을 변경하시려면 사진을 업로드 하세요."
         visible={uploadPopup}
         onVisibleChange={setUploadPopup}
-        defaultPreview={`${getCdn()}/${getStorage()?.user?.profile!}`}
+        defaultPreview={
+          user.profile
+            ? `${getCdn()}/${getStorage()?.user?.profile!}`
+            : "/person.svg"
+        }
         confirmCondition={(value) => value !== null}
         limitImgSizeX={imgLimit.profile.imgSizeX}
         limitImgSizeY={imgLimit.profile.imgSizeY}
