@@ -21,8 +21,23 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Test with gradle
+    - name: Grant execute permission for gradlew
+      run: |
+        cd jasao-server
+        chmod +x gradlew
+
+    - name: Build with Gradle # 실제 application build(-x 옵션을 통해 test는 제외)
+      run: |
+        cd jasao-server
+        ./gradlew build -x test
+
+    - name: Test with Gradle # test application build
       run: |
         cd jasao-server
         ./gradlew test
-      
+
+    - name: Publish Unit Test Results # test 후 result를 보기 위해 추가
+      uses: EnricoMi/publish-unit-test-result-action@v1
+      if: ${{ always() }} # test가 실패해도 report를 남기기 위해 설정
+      with:
+        files: jasao-server/build/test-results/**/*.xml
