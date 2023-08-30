@@ -11,7 +11,7 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -21,8 +21,6 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-    - name: Direct to spring project
-      
     - name: Test with gradle
       run: |
         cd jasao-server
