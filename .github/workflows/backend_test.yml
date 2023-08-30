@@ -3,9 +3,9 @@ name: Backend test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 permissions:
   contents: read
@@ -22,8 +22,9 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
     - name: Direct to spring project
-      run: cd jasao-server
+      
     - name: Test with gradle
-      uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-      with:
-        arguments: test
+      run: |
+        cd jasao-server
+        ./gradlew test
+      
