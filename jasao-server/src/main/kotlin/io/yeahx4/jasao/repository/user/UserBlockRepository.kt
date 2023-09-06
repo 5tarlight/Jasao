@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface UserBlockRepository: JpaRepository<UserBlock, String> {
     fun existsByOperatorAndTarget(operator: Long, target: Long): Boolean
-    fun deleteByOperatorAndTarget(operator: Long, target: Long);
+    fun deleteByOperatorAndTarget(operator: Long, target: Long)
 }

@@ -11,7 +11,6 @@ import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.Res
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
-import org.springframework.cglib.core.Block
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
@@ -106,8 +105,8 @@ class UserCommunityController(
         @RequestHeader("Authorization") jwt: String,
         @RequestParam target: Long
     ): Boolean {
-        val me = this.jwtService.getUserFromToken(jwt);
-        return this.followingService.isUserFollow(me.id, target);
+        val me = this.jwtService.getUserFromToken(jwt)
+        return this.followingService.isUserFollow(me.id, target)
     }
 
     @PostMapping("/auth/block")
