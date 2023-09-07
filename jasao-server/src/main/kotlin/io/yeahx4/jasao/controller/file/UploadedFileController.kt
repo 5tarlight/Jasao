@@ -53,7 +53,7 @@ class UploadedFileController(
     @DeleteMapping("/auth/profile/delete")
     @Transactional
     fun deleteProfileImage(@RequestHeader("Authorization") jwt: String): Res<String> {
-        val user = this.jwtService.getUserFromToken(jwt);
+        val user = this.jwtService.getUserFromToken(jwt)
         val dbUser = this.userService.getUserById(user.id)!!
 
         if (!this.uploadedFileService.deleteProfileImage(user.id, user.profile.endsWith(".jpg"))) {
