@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 /**
  * Main configuration of Spring project.
  * Configure Spring Beans.
+ *
+ * @since 1.0.0
  */
 @Configuration
 class SpringConfig {

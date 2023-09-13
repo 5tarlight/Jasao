@@ -23,6 +23,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
  * Jasao uses JWT to authorize users.
  * Before each controller or other services, JWT filter chain takes token and
  * validate JWT with due date, DB table validation.
+ *
+ * @since 1.0.0
  */
 @EnableWebSecurity
 @Configuration
