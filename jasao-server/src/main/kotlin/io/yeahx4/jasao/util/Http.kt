@@ -31,9 +31,30 @@ data class HttpResponse<T>(
     val data: T?
 )
 
+/**
+ * Http Response data class without payload.
+ *
+ * @see HttpResponse
+ * @since 1.0.0
+ */
 data class MessageHttpResponse(
     val message: String
 )
 
+/**
+ * Alias of `ResponseEntity<HttpResponse<T>>`
+ *
+ * @since 1.0
+ * @see HttpResponse
+ * @see ResponseEntity
+ */
 typealias Res<T> = ResponseEntity<HttpResponse<T>>
+
+/**
+ * Alias of `ResponseEntity<MessageHttpResponse>>`
+ *
+ * @since 1.0
+ * @see MessageHttpResponse
+ * @see ResponseEntity
+ */
 typealias MsgRes = ResponseEntity<MessageHttpResponse>

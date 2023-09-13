@@ -10,7 +10,7 @@ import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
 import io.yeahx4.jasao.role.user.UserRole
-import io.yeahx4.jasao.service.UuidService
+import io.yeahx4.jasao.service.uuid.UuidService
 import io.yeahx4.jasao.service.user.RefreshTokenService
 import io.yeahx4.jasao.service.user.UserService
 import io.yeahx4.jasao.util.HttpResponse
