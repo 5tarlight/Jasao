@@ -5,8 +5,20 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 
+/**
+ * Service for file upload system.
+ * Uploaded file except for profile image will be stored in
+ * physical file system and DB table.
+ *
+ * @since 1.1.0
+ */
 @Service
 class UploadedFileService(private val uploadedFileRepository: UploadedFileRepository) {
+    /**
+     * Save profile image to local file system.
+     * Acceptable types is `.png` and `.jpg`.
+     * Uploaded file is stored in public folder of CDN server.
+     */
     fun saveProfileImage(owner: Long, file: MultipartFile): String {
         val path = arrayOf(
             System.getProperty("user.dir"),
@@ -44,6 +56,11 @@ class UploadedFileService(private val uploadedFileRepository: UploadedFileReposi
         return "/images/${owner}/profile${ext}"
     }
 
+    /**
+     * Delete profile image of target user
+     *
+     * @return Success
+     */
     fun deleteProfileImage(user: Long, isJgp: Boolean): Boolean {
         val path = arrayOf(
             System.getProperty("user.dir"),
