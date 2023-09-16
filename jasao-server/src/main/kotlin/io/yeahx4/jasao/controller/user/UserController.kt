@@ -33,6 +33,19 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * # Features
+ * - User CRU(D)
+ * - Login & Logout
+ * - JWT refresh
+ *
+ * @since 1.0.0
+ * @see UserService
+ * @see JwtTokenProvider
+ * @see JwtService
+ * @see UuidService
+ * @see RefreshTokenService
+ */
 @RestController
 @RequestMapping("/user")
 class UserController(
@@ -44,6 +57,25 @@ class UserController(
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
+    /**
+     * Create new User
+     *
+     * # Request
+     *
+     * ### HTTP
+     * POST `/user/signup`
+     *
+     * ### Body
+     * - email: String
+     * - username: String
+     * - password: String raw password
+     *
+     * # Response
+     * - 201 : Success
+     * - 400 : Email or username is already taken
+     *
+     * @since 1.0.0
+     */
     @PostMapping("/signup")
     fun signup(@RequestBody dto: SignUpDto): MsgRes {
         val check = this.userService.isDuplicatedSignup(dto)
@@ -71,10 +103,38 @@ class UserController(
         }
     }
 
+    /**
+     * Login to signed-up user.
+     * Require http-only cookie.
+     *
+     * # Request
+     * ### HTTP
+     * POST `/user/login`
+     *
+     * ### Body
+     * - email: String
+     * - password: String raw password
+     *
+     * # Response
+     * - 400 : Email is not valid format (disabled)
+     * - 404 : Invalid email or password
+     * - 200 : Success
+     * ```json
+     * {
+     *      "id": String,
+     *      "email": String,
+     *      "username": String,
+     *      "role": String (enum),
+     *      "profile": String? possibly "",
+     *      "bio": String? possibly "",
+     *      "token": String JWT
+     * }
+     * ```
+     */
     @PostMapping("/login")
     fun login(@RequestBody dto: LoginDto, response: HttpServletResponse): Res<LoginResDto> {
-        if (!isEmail(dto.email))
-            return Res(HttpResponse("Invalid format of email", null), HttpStatus.BAD_REQUEST)
+//        if (!isEmail(dto.email))
+//            return Res(HttpResponse("Invalid format of email", null), HttpStatus.BAD_REQUEST)
 
         val user = this.userService.getUserByEmail(dto.email)
 
@@ -113,6 +173,23 @@ class UserController(
         return Res(HttpResponse("Ok", user.toDto().toLoginRes(token)), HttpStatus.OK)
     }
 
+    /**
+     * Update user data
+     *
+     * # Request
+     * ### HTTP
+     * PATCH `/auth/update`
+     *
+     * ### Body
+     * - username: String?
+     * - password: String?
+     * - bio: String?
+     * - oldPassword: String
+     *
+     * # Response
+     * - 403 : Invalid password
+     * - 200 : Success
+     */
     @Transactional
     @PatchMapping("/auth/update")
     fun update(
@@ -146,6 +223,23 @@ class UserController(
         return Res(HttpResponse("Success", null), HttpStatus.OK)
     }
 
+    /**
+     * Refresh JWT
+     *
+     * # Request
+     * ### HTTP
+     * POST `/user/refresh`
+     *
+     * ### Header
+     * - Authorization: JWT
+     *
+     * # Response
+     * - 400 : Unknown refresh token. Generally logged out
+     * - 400 : Expired token. login again.
+     * - 400 : Delete user
+     * - 403 : Suspicious. Logout all account now.
+     * - 200 : Success
+     */
     @PostMapping("/refresh")
     @Transactional
     fun refresh(
@@ -219,6 +313,21 @@ class UserController(
         return Res(HttpResponse("Ok", RefreshResDto(newToken)), HttpStatus.OK)
     }
 
+    /**
+     * Logout
+     *
+     * # Request
+     * ### HTTP
+     * GET `/user/auth/logout`
+     *
+     * ### Header
+     * Authorization: JWT
+     *
+     * # Response
+     * - 403 : Refresh token is null
+     * - 404 : Token is not valid
+     * - 200 : Success
+     */
     @GetMapping("/auth/logout")
     @Transactional
     fun logout(
@@ -261,6 +370,30 @@ class UserController(
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 
+    /**
+     * Get user by ID
+     *
+     * # Request
+     * ### HTTP
+     * GET `/user/id`
+     *
+     * ### Param
+     * id: Long
+     *
+     * # Response
+     * - 404 : Not Found
+     * - 200 : Success
+     * ```json
+     * {
+     *      "id": Long,
+     *      "email": String,
+     *      "username": String,
+     *      "role": String (enum),
+     *      "profile": String? possibly "",
+     *      "bio": String
+     * }
+     * ```
+     */
     @GetMapping("/id")
     fun getUserById(@RequestParam id: Long): Res<UserDto> {
         val user = this.userService.getUserById(id)
@@ -270,6 +403,29 @@ class UserController(
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
 
+    /**
+     * Get my details
+     *
+     * # Request
+     * ### HTTP
+     * GET `/user/auth/me`
+     *
+     * ### Header
+     * Authorization: JWT
+     *
+     * # Response
+     * - 200 : Success
+     * ```json
+     * {
+     *      "id": Long,
+     *      "email": String,
+     *      "username": String,
+     *      "role": String (enum),
+     *      "profile": String? possibly "",
+     *      "bio": String
+     * }
+     * ```
+     */
     @GetMapping("/auth/me")
     fun getMyProfile(@RequestHeader("Authorization") jwt: String): Res<UserDto> {
         val user = this.jwtService.getUserFromToken(jwt)
