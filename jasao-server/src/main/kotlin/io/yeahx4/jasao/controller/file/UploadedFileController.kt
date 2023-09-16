@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 
+/**
+ * Controller for file upload system
+ *
+ * @since 1.1.0
+ */
 @RestController
 @RequestMapping("/file")
 class UploadedFileController(
@@ -26,6 +31,23 @@ class UploadedFileController(
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
+    /**
+     * Upload file
+     *
+     * # Request
+     * ### HTTP
+     * POST `/file/auth/upload`
+     *
+     * ### param
+     * - role : "profile"
+     *
+     * ### body
+     * - MultipartFile
+     *
+     * # Response
+     * - 400 : Invalid role
+     * - 200 : Success
+     */
     @PostMapping("/auth/upload")
     @Transactional
     fun uploadImage(
@@ -50,6 +72,20 @@ class UploadedFileController(
         }
     }
 
+    /**
+     * Delete uploaded file
+     *
+     * # Request
+     * ### HTTP
+     * DELETE `/file/auth/profile/delete`
+     *
+     * ### Header
+     * - Authorization: JWT
+     *
+     * # Response
+     * - 400 : Image not exists
+     * - 200 : Success
+     */
     @DeleteMapping("/auth/profile/delete")
     @Transactional
     fun deleteProfileImage(@RequestHeader("Authorization") jwt: String): Res<String> {
