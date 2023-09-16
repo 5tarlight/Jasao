@@ -7,15 +7,28 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 
+/**
+ * Service for user system management.
+ * CRUD for user details, JWT system.
+ *
+ * @since 1.0.0
+ * @see User
+ */
 @Service
 class UserService(
     private val userRepository: UserRepository,
     private val encoder: BCryptPasswordEncoder
 ) {
+    /**
+     * Save User instance to DB.
+     */
     fun saveUser(user: User) {
         this.userRepository.save(user)
     }
 
+    /**
+     * Check if user with duplicated or taken credentials is trying to newly sign up.
+     */
     fun isDuplicatedSignup(dto: SignUpDto): Pair<Boolean, String> {
         val emailUser = this.userRepository.findByEmail(dto.email)
         if (emailUser != null) {
@@ -30,14 +43,27 @@ class UserService(
         return Pair(true, "")
     }
 
+    /**
+     * Encrypt password with BCrypt
+     *
+     * @see BCryptPasswordEncoder
+     */
     fun encrypt(password: String): String {
         return this.encoder.encode(password)
     }
 
+    /**
+     * Find user with email.
+     *
+     * @return Target user. `null` if not found.
+     */
     fun getUserByEmail(email: String): User? {
         return this.userRepository.findByEmail(email)
     }
 
+    /**
+     * Check if raw password and encrypted password are same.
+     */
     fun matchPassword(rawPw: String, encrypted: String): Boolean {
         return this.encoder.matches(rawPw, encrypted)
     }

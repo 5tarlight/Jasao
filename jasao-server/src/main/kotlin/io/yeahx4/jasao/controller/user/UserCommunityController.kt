@@ -23,6 +23,13 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * User Community System
+ *
+ * # Features
+ * - Follow & Unfollow
+ * - Block
+ */
 @RestController
 @RequestMapping("/users")
 class UserCommunityController(
@@ -33,6 +40,21 @@ class UserCommunityController(
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
+    /**
+     * Follow user
+     *
+     * # Request
+     * ### HTTP
+     * POST `/users/auth/follow`
+     *
+     * ### Body
+     * target: Long target user to follow
+     *
+     * # Response
+     * - 400 : Target id is same to mine (self-follow)
+     * - 400 : Already following
+     * - 200 : Success
+     */
     @PostMapping("/auth/follow")
     fun follow(
         @RequestHeader("Authorization") jwt: String,
@@ -55,6 +77,19 @@ class UserCommunityController(
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 
+    /**
+     * Unfollow
+     *
+     * # Request
+     * ### HTTP
+     * POST `/users/auth/unfollow`
+     *
+     * ### Body
+     * target: Long target user to unfollow
+     *
+     * # Response
+     * - 200 : Ok
+     */
     @PostMapping("/auth/unfollow")
     @Transactional
     fun unfollow(
@@ -70,6 +105,36 @@ class UserCommunityController(
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 
+    /**
+     * Search users target is following
+     *
+     * # Request
+     * ### HTTP
+     * GET `/users/following`
+     *
+     * ### Param
+     * - page: Int
+     * - id : Long
+     *
+     * # Response
+     * - 200 : Ok
+     * ```json
+     * {
+     *      "page": int,
+     *      "maxPage": int,
+     *      "count": int number of all users
+     *      "payload": [
+     *          {
+     *              "id": Long,
+     *              "username": String,
+     *              "profile": String?,
+     *              "bio": String
+     *          },
+     *          ...
+     *      ]
+     * }
+     * ```
+     */
     @GetMapping("/following")
     fun getFollowing(
         @RequestParam id: Long,
@@ -85,6 +150,36 @@ class UserCommunityController(
         )
     }
 
+    /**
+     * Search users following target user
+     *
+     * # Request
+     * ### HTTP
+     * GET `/users/followed`
+     *
+     * ### Param
+     * - page: Int
+     * - id : Long
+     *
+     * # Response
+     * - 200 : Ok
+     * ```json
+     * {
+     *      "page": int,
+     *      "maxPage": int,
+     *      "count": int number of all users
+     *      "payload": [
+     *          {
+     *              "id": Long,
+     *              "username": String,
+     *              "profile": String?,
+     *              "bio": String
+     *          },
+     *          ...
+     *      ]
+     * }
+     * ```
+     */
     @GetMapping("/followed")
     fun getFollowed(
         @RequestParam id: Long,
@@ -100,6 +195,19 @@ class UserCommunityController(
         )
     }
 
+    /**
+     * Check I'm following target user
+     *
+     * # Request
+     * ### HTTP
+     * GET `/users/auth/isfollow`
+     *
+     * ### Param
+     * - target: Long
+     *
+     * # Response
+     * Boolean
+     */
     @GetMapping("/auth/isfollow")
     fun isFollowing(
         @RequestHeader("Authorization") jwt: String,
@@ -109,6 +217,19 @@ class UserCommunityController(
         return this.followingService.isUserFollow(me.id, target)
     }
 
+    /**
+     * Block and unfollow target user
+     *
+     * # Request
+     * ### HTTP
+     * POST `/users/auth/block`
+     *
+     * ### Body
+     * - target: Long
+     *
+     * # Response
+     * - 200 : Success
+     */
     @PostMapping("/auth/block")
     @Transactional
     fun blockUser(
@@ -123,6 +244,24 @@ class UserCommunityController(
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 
+    /**
+     * Check if I've blocked target user
+     *
+     * # Request
+     * ### HTTP
+     * GET `/users/auth/isblocking`
+     *
+     * # param
+     * target: Long
+     *
+     * # Response
+     * - 200 : Success
+     * ```json
+     * {
+     *      data: Boolean
+     * }
+     * ```
+     */
     @GetMapping("/auth/isblocking")
     fun isBlocking(
         @RequestHeader("Authorization") jwt: String,
@@ -134,6 +273,22 @@ class UserCommunityController(
         return Res(HttpResponse("Ok", isBlocking), HttpStatus.OK)
     }
 
+    /**
+     * Unblock user
+     *
+     * # Request
+     * ### HTTP
+     * DELETE `/users/auth/unblock`
+     *
+     * ### Header
+     * - Authorization: JWT
+     *
+     * ### Param
+     * - target: Long
+     *
+     * # Response
+     * - 200 : Success
+     */
     @DeleteMapping("/auth/unblock")
     @Transactional
     fun unblock(
@@ -143,7 +298,7 @@ class UserCommunityController(
         val user = this.jwtService.getUserFromToken(jwt)
         this.blockUserService.unblock(user.id, target)
 
-        this.logger.info("User ${user.id} unblocks user ${target}")
+        this.logger.info("User ${user.id} unblocks user $target")
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }
