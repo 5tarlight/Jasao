@@ -458,7 +458,7 @@ class UserController(
         @RequestBody file: MultipartFile
     ): Res<String> {
         val user = this.jwtService.getUserFromToken(jwt)
-        val path = this.uploadedFileService.saveProfileImage(user.id, file)
+        val path = this.userService.saveProfileImage(user.id, file)
         val dbUser = userService.getUserById(user.id)!!
         dbUser.profile = path
 
