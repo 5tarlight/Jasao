@@ -68,6 +68,7 @@ const UploadFilePopup: FC<Props> = ({
   const [file, setFile] = useState<File | null>(defaultFile);
   const [img, setImg] = useState<any>(defaultPreview);
   const [error, setError] = useState(!preview);
+  const [imgSelected, setImgSelected] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -82,7 +83,7 @@ const UploadFilePopup: FC<Props> = ({
         const w = imgRef.current?.naturalWidth;
         const h = imgRef.current?.naturalHeight;
 
-        if (onError && w && h) {
+        if (onError && w && h && imgSelected) {
           if (maxImgHeight && maxImgWidth) {
             if (w > maxImgWidth || h > maxImgHeight) {
               onError(
@@ -108,7 +109,16 @@ const UploadFilePopup: FC<Props> = ({
       imgRef.current.src = img;
     }
     // eslint-disable-next-line
-  }, [img, imgRef, inputRef, maxImgWidth, maxImgHeight]);
+  }, [
+    img,
+    imgRef,
+    inputRef,
+    maxImgWidth,
+    maxImgHeight,
+    minImgHeight,
+    minImgWidth,
+    imgSelected,
+  ]);
 
   return (
     <>
@@ -187,10 +197,11 @@ const UploadFilePopup: FC<Props> = ({
                   return;
                 }
 
-                var reader = new FileReader();
+                const reader = new FileReader();
 
-                reader.onload = function (e) {
+                reader.onload = (e) => {
                   setImg(e.target?.result);
+                  setImgSelected(true);
                 };
 
                 reader.readAsDataURL(e.target.files[0]);
@@ -199,7 +210,7 @@ const UploadFilePopup: FC<Props> = ({
           />
         </div>
       </Popup>
-      <img ref={imgRef} style={{ display: "none" }} alt="size test"></img>
+      <img ref={imgRef} style={{ display: "none" }} alt="New profile"></img>
     </>
   );
 };
