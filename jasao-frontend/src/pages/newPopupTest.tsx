@@ -9,8 +9,8 @@ const NewPopupTest: FC = () => {
       onSubmit={(e) => console.log(e)}
       onCancel={() => window.alert("cancel")}
       confirmCondition={(value) => value !== null}
-      limitImgSizeX={imgLimit.profile.imgSizeX}
-      limitImgSizeY={imgLimit.profile.imgSizeY}
+      maxImgWidth={imgLimit.profile.maxWidth}
+      maxImgHeight={imgLimit.profile.maxHeight}
       limitFileSize={imgLimit.profile.fileSize}
       acceptExts={imgLimit.profile.exts}
       onError={(message) => window.alert(message)}

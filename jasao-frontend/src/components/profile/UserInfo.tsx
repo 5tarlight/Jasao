@@ -362,8 +362,10 @@ const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
           user.profile ? `${getCdn()}/${user.profile}` : "/person.svg"
         }
         confirmCondition={(value) => value !== null}
-        limitImgSizeX={imgLimit.profile.imgSizeX}
-        limitImgSizeY={imgLimit.profile.imgSizeY}
+        maxImgWidth={imgLimit.profile.maxWidth}
+        maxImgHeight={imgLimit.profile.maxHeight}
+        minImgWidth={imgLimit.profile.minWidth}
+        minImgHeight={imgLimit.profile.minHeight}
         limitFileSize={imgLimit.profile.fileSize}
         acceptExts={imgLimit.profile.exts}
         deleteBtn={!!user.profile}
