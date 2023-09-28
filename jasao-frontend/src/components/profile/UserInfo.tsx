@@ -149,7 +149,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
         break;
 
       case "remove-profile-image":
-        requestWithLogin("delete", "file/auth/profile/delete");
+        requestWithLogin("delete", "user/auth/profile/delete");
         // .then((res) => console.log(res))
         // .catch((reason) => console.log(reason));
         break;
@@ -376,7 +376,7 @@ const UserInfo: FC<Props> = ({ user, isMine, myId, reloadUser }) => {
           const formData = new FormData();
           formData.append("file", e.file);
           axios
-            .post(`${getServer()}/file/auth/upload?role=profile`, formData, {
+            .post(`${getServer()}/user/auth/profile`, formData, {
               headers: {
                 Authorization: getStorage()?.login?.jwt,
                 "Content-Type": "multipart/form-data",

@@ -78,14 +78,18 @@ const UploadFilePopup: FC<Props> = ({
         const w = imgRef.current?.naturalWidth;
         const h = imgRef.current?.naturalHeight;
 
-        if (onError && ((w && w > limitImgSizeX) || (h && h > limitImgSizeY))) {
-          onError(
-            `이미지 크기는 ${limitImgSizeX}x${limitImgSizeY} 이내여야 합니다.`
-          );
-          if (inputRef.current) inputRef.current.files = null;
-          setError(true);
-          setFile(null);
-          imgRef.current.src = "";
+        if (onError && w && h) {
+          if (w > limitImgSizeX || h > limitImgSizeY) {
+            onError(
+              `이미지 크기는 ${limitImgSizeX}x${limitImgSizeY} 이내여야 합니다.`
+            );
+            if (inputRef.current) inputRef.current.files = null;
+            setError(true);
+            setFile(null);
+            imgRef.current.src = "";
+          } else if (w < 1 || h < 1) {
+            // TODO
+          }
         }
       };
       imgRef.current.src = img;

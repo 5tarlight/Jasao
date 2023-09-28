@@ -10,6 +10,7 @@ import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
 import io.yeahx4.jasao.role.user.UserRole
+import io.yeahx4.jasao.service.file.UploadedFileService
 import io.yeahx4.jasao.service.uuid.UuidService
 import io.yeahx4.jasao.service.user.RefreshTokenService
 import io.yeahx4.jasao.service.user.UserService
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseCookie
 import org.springframework.web.bind.annotation.CookieValue
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -32,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 
 /**
  * # Features
@@ -53,7 +56,8 @@ class UserController(
     private val jwtTokenProvider: JwtTokenProvider,
     private val jwtService: JwtService,
     private val uuidService: UuidService,
-    private val refreshTokenService: RefreshTokenService
+    private val refreshTokenService: RefreshTokenService,
+    private val uploadedFileService: UploadedFileService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -432,5 +436,65 @@ class UserController(
 
         this.logger.info("User ${user.id} self identification")
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
+    }
+
+    /**
+     * Upload file
+     *
+     * # Request
+     * ### HTTP
+     * POST `/user/auth/upload`
+     *
+     * ### body
+     * - MultipartFile
+     *
+     * # Response
+     * - 200 : Success
+     */
+    @PostMapping("/auth/profile")
+    @Transactional
+    fun uploadImage(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestBody file: MultipartFile
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        val path = this.uploadedFileService.saveProfileImage(user.id, file)
+        val dbUser = userService.getUserById(user.id)!!
+        dbUser.profile = path
+
+        this.logger.info("Profile image upload by user ${user.id}")
+
+        return Res(HttpResponse("Ok", path), HttpStatus.OK)
+    }
+
+    /**
+     * Delete uploaded file
+     *
+     * # Request
+     * ### HTTP
+     * DELETE `/user/auth/profile/delete`
+     *
+     * ### Header
+     * - Authorization: JWT
+     *
+     * # Response
+     * - 400 : Image not exists
+     * - 200 : Success
+     */
+    @DeleteMapping("/auth/profile/delete")
+    @Transactional
+    fun deleteProfileImage(@RequestHeader("Authorization") jwt: String): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        val dbUser = this.userService.getUserById(user.id)!!
+
+        if (!this.uploadedFileService.deleteProfileImage(user.id, user.profile.endsWith(".jpg"))) {
+            this.logger.warn("User ${user.id} tried to delete non-exist profile image")
+            return Res(HttpResponse("File not exists", null), HttpStatus.BAD_REQUEST)
+        } else {
+            dbUser.profile = ""
+        }
+
+        this.logger.info("User ${user.id} removed its profile image")
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }
