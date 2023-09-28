@@ -439,7 +439,7 @@ class UserController(
     }
 
     /**
-     * Upload file
+     * Upload profile image
      *
      * # Request
      * ### HTTP
@@ -468,7 +468,7 @@ class UserController(
     }
 
     /**
-     * Delete uploaded file
+     * Delete profile image
      *
      * # Request
      * ### HTTP
