@@ -450,6 +450,7 @@ class UserController(
      *
      * # Response
      * - 200 : Success
+     * - 400 : Invalid file format. Not jpg or png
      */
     @PostMapping("/auth/profile")
     @Transactional
@@ -458,9 +459,19 @@ class UserController(
         @RequestBody file: MultipartFile
     ): Res<String> {
         val user = this.jwtService.getUserFromToken(jwt)
-        val path = this.userService.saveProfileImage(user.id, file)
+
+        val ext = if (file.contentType == "image/jpeg") {
+            ".jpg"
+        } else if (file.contentType == "image/png") {
+            ".png"
+        } else {
+            return Res(HttpResponse("Invalid file format", null), HttpStatus.BAD_REQUEST)
+        }
+
+        val path = this.userService.saveProfileImage(user.id, file, ext)
         val dbUser = userService.getUserById(user.id)!!
         dbUser.profile = path
+        this.uploadedFileService.saveProfileImage(user.id, ext)
 
         this.logger.info("Profile image upload by user ${user.id}")
 
@@ -487,10 +498,11 @@ class UserController(
         val user = this.jwtService.getUserFromToken(jwt)
         val dbUser = this.userService.getUserById(user.id)!!
 
-        if (!this.uploadedFileService.deleteProfileImage(user.id, user.profile.endsWith(".jpg"))) {
+        if (!this.userService.deleteProfileImage(user.id, user.profile.endsWith(".jpg"))) {
             this.logger.warn("User ${user.id} tried to delete non-exist profile image")
             return Res(HttpResponse("File not exists", null), HttpStatus.BAD_REQUEST)
         } else {
+            this.uploadedFileService.deleteProfileImage(user.id)
             dbUser.profile = ""
         }
 

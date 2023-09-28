@@ -83,7 +83,7 @@ class UserService(
      * Acceptable types is `.png` and `.jpg`.
      * Uploaded file is stored in public folder of CDN server.
      */
-    fun saveProfileImage(owner: Long, file: MultipartFile): String {
+    fun saveProfileImage(owner: Long, file: MultipartFile, ext: String): String {
         val path = arrayOf(
             System.getProperty("user.dir"),
             "..",
@@ -99,14 +99,6 @@ class UserService(
         }
 
         if (file.isEmpty) {
-            return ""
-        }
-
-        val ext = if (file.contentType == "image/jpeg") {
-            ".jpg"
-        } else if (file.contentType == "image/png") {
-            ".png"
-        } else {
             return ""
         }
 
