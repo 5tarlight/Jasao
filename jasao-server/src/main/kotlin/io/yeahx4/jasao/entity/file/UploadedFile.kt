@@ -22,7 +22,7 @@ data class UploadedFile(
     val owner: Long,
 
     @Column(nullable = false)
-    val path: String,
+    var path: String,
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -30,5 +30,5 @@ data class UploadedFile(
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    val extension: FileExtension
+    var extension: FileExtension
 ): TimeEntity()

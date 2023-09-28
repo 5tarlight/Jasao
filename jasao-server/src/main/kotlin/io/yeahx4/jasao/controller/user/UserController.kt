@@ -9,6 +9,7 @@ import io.yeahx4.jasao.dto.user.UserDto
 import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
+import io.yeahx4.jasao.role.file.FileExtension
 import io.yeahx4.jasao.role.user.UserRole
 import io.yeahx4.jasao.service.file.UploadedFileService
 import io.yeahx4.jasao.service.uuid.UuidService
@@ -471,7 +472,13 @@ class UserController(
         val path = this.userService.saveProfileImage(user.id, file, ext)
         val dbUser = userService.getUserById(user.id)!!
         dbUser.profile = path
-        this.uploadedFileService.saveProfileImage(user.id, ext)
+        if (this.uploadedFileService.isProfileExists(user.id)) {
+            val img = this.uploadedFileService.getProfileImageByOwner(user.id)!!
+            img.extension = if (ext == ".jpg") FileExtension.JPEG else FileExtension.PNG
+            img.path = "/images/${user.id}/profile${ext}"
+        } else {
+            this.uploadedFileService.saveProfileImage(user.id, ext)
+        }
 
         this.logger.info("Profile image upload by user ${user.id}")
 

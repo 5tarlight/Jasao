@@ -28,4 +28,12 @@ class UploadedFileService(private val uploadedFileRepository: UploadedFileReposi
     fun deleteProfileImage(user: Long) {
         this.uploadedFileRepository.deleteByOwner(user)
     }
+
+    fun isProfileExists(user: Long): Boolean {
+        return this.uploadedFileRepository.findByOwner(user) != null
+    }
+
+    fun getProfileImageByOwner(user: Long): UploadedFile? {
+        return this.uploadedFileRepository.findByOwner(user)
+    }
 }
