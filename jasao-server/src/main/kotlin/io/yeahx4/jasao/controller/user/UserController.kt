@@ -19,7 +19,6 @@ import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.MessageHttpResponse
 import io.yeahx4.jasao.util.MsgRes
 import io.yeahx4.jasao.util.Res
-import io.yeahx4.jasao.util.isEmail
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
@@ -404,7 +403,7 @@ class UserController(
         val user = this.userService.getUserById(id)
             ?: return Res(HttpResponse("Not Found", null), HttpStatus.NOT_FOUND)
 
-        this.logger.info("User ${id} profile request")
+        this.logger.info("User $id profile request")
         return Res(HttpResponse("Ok", user.toDto()), HttpStatus.OK)
     }
 
@@ -461,24 +460,30 @@ class UserController(
     ): Res<String> {
         val user = this.jwtService.getUserFromToken(jwt)
 
-        val ext = if (file.contentType == "image/jpeg") {
-            ".jpg"
-        } else if (file.contentType == "image/png") {
-            ".png"
-        } else {
-            return Res(HttpResponse("Invalid file format", null), HttpStatus.BAD_REQUEST)
+        val ext = when (file.contentType) {
+            "image/jpeg" -> {
+                ".jpg"
+            }
+            "image/png" -> {
+                ".png"
+            }
+            else -> {
+                return Res(HttpResponse("Invalid file format", null), HttpStatus.BAD_REQUEST)
+            }
         }
 
         val path = this.userService.saveProfileImage(user.id, file, ext)
-        val dbUser = userService.getUserById(user.id)!!
-        dbUser.profile = path
-        if (this.uploadedFileService.isProfileExists(user.id)) {
+
+        if (user.profile != "") {
             val img = this.uploadedFileService.getProfileImageByOwner(user.id)!!
             img.extension = if (ext == ".jpg") FileExtension.JPEG else FileExtension.PNG
             img.path = "/images/${user.id}/profile${ext}"
         } else {
             this.uploadedFileService.saveProfileImage(user.id, ext)
         }
+
+        val dbUser = userService.getUserById(user.id)!!
+        dbUser.profile = path
 
         this.logger.info("Profile image upload by user ${user.id}")
 

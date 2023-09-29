@@ -29,6 +29,7 @@ class UploadedFileService(private val uploadedFileRepository: UploadedFileReposi
         this.uploadedFileRepository.deleteByOwner(user)
     }
 
+    @Deprecated("You can infer if profile eixsts through profile field of user")
     fun isProfileExists(user: Long): Boolean {
         return this.uploadedFileRepository.findByOwner(user) != null
     }
