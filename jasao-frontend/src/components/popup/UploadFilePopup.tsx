@@ -29,8 +29,10 @@ interface Props {
   defaultFile?: File;
   defaultPreview?: string;
   preview?: boolean;
-  limitImgSizeX?: number;
-  limitImgSizeY?: number;
+  maxImgWidth?: number;
+  maxImgHeight?: number;
+  minImgWidth?: number;
+  minImgHeight?: number;
   limitFileSize?: number;
   onError?: (message: string) => void;
   acceptExts?: string;
@@ -54,16 +56,19 @@ const UploadFilePopup: FC<Props> = ({
   defaultPreview,
   preview = false,
   limitFileSize,
-  limitImgSizeX,
-  limitImgSizeY,
+  maxImgWidth,
+  maxImgHeight,
   onError,
   acceptExts,
   deleteBtn = false,
   onDelete = () => {},
+  minImgHeight = 0,
+  minImgWidth = 0,
 }) => {
   const [file, setFile] = useState<File | null>(defaultFile);
   const [img, setImg] = useState<any>(defaultPreview);
   const [error, setError] = useState(!preview);
+  const [imgSelected, setImgSelected] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -73,25 +78,47 @@ const UploadFilePopup: FC<Props> = ({
   };
 
   useEffect(() => {
-    if (imgRef.current && limitImgSizeX && limitImgSizeY) {
+    if (imgRef.current && maxImgWidth && maxImgHeight) {
       imgRef.current.onload = (e) => {
         const w = imgRef.current?.naturalWidth;
         const h = imgRef.current?.naturalHeight;
 
-        if (onError && ((w && w > limitImgSizeX) || (h && h > limitImgSizeY))) {
-          onError(
-            `이미지 크기는 ${limitImgSizeX}x${limitImgSizeY} 이내여야 합니다.`
-          );
-          if (inputRef.current) inputRef.current.files = null;
-          setError(true);
-          setFile(null);
-          imgRef.current.src = "";
+        if (onError && w && h && imgSelected) {
+          if (maxImgHeight && maxImgWidth) {
+            if (w > maxImgWidth || h > maxImgHeight) {
+              onError(
+                `이미지 크기는 ${maxImgWidth}x${maxImgHeight} 이내여야 합니다.`
+              );
+              if (inputRef.current) inputRef.current.files = null;
+              setError(true);
+              setFile(null);
+              imgRef.current.src = "";
+            }
+          }
+          if (w < minImgWidth || h < minImgHeight) {
+            onError(
+              `이미지 크기는 ${minImgWidth}x${minImgHeight} 이상이어야 합니다.`
+            );
+            if (inputRef.current) inputRef.current.files = null;
+            setError(true);
+            setFile(null);
+            imgRef.current.src = "";
+          }
         }
       };
       imgRef.current.src = img;
     }
     // eslint-disable-next-line
-  }, [img, imgRef, inputRef, limitImgSizeX, limitImgSizeY]);
+  }, [
+    img,
+    imgRef,
+    inputRef,
+    maxImgWidth,
+    maxImgHeight,
+    minImgHeight,
+    minImgWidth,
+    imgSelected,
+  ]);
 
   return (
     <>
@@ -170,10 +197,11 @@ const UploadFilePopup: FC<Props> = ({
                   return;
                 }
 
-                var reader = new FileReader();
+                const reader = new FileReader();
 
-                reader.onload = function (e) {
+                reader.onload = (e) => {
                   setImg(e.target?.result);
+                  setImgSelected(true);
                 };
 
                 reader.readAsDataURL(e.target.files[0]);
@@ -182,7 +210,7 @@ const UploadFilePopup: FC<Props> = ({
           />
         </div>
       </Popup>
-      <img ref={imgRef} style={{ display: "none" }} alt="size test"></img>
+      <img ref={imgRef} style={{ display: "none" }} alt="New profile"></img>
     </>
   );
 };

@@ -72,8 +72,10 @@ export const validate = (
 
 export const imgLimit = {
   profile: {
-    imgSizeX: 1024,
-    imgSizeY: 1024,
+    maxWidth: 1024,
+    maxHeight: 1024,
+    minWidth: 128,
+    minHeight: 128,
     fileSize: 5 * 1024 * 1024,
     exts: "image/jpeg, image/png",
   },
