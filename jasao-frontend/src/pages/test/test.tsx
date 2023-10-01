@@ -1,5 +1,5 @@
 import { FC, useState } from "react";
-import styles from "../styles/Test.module.scss";
+import styles from "../../styles/Test.module.scss";
 import classNames from "classnames/bind";
 import axios from "axios";
 import { getServer } from "../../util/server";

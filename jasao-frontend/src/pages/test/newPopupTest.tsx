@@ -1,6 +1,6 @@
 import { FC } from "react";
-import UploadFilePopup from "../components/popup/UploadFilePopup";
-import { imgLimit } from "../util/auth";
+import UploadFilePopup from "../../components/popup/UploadFilePopup";
+import { imgLimit } from "../../util/auth";
 
 const NewPopupTest: FC = () => {
   return (
