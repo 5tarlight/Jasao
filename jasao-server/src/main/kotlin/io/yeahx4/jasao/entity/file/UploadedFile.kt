@@ -30,5 +30,8 @@ data class UploadedFile(
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    var extension: FileExtension
+    var extension: FileExtension,
+
+    @Column(nullable = false)
+    val payload: String,
 ): TimeEntity()

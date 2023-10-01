@@ -2,6 +2,7 @@ package io.yeahx4.jasao.controller.cafe
 
 import io.yeahx4.jasao.dto.cafe.CreateCafeDto
 import io.yeahx4.jasao.dto.cafe.UpdateCafeDto
+import io.yeahx4.jasao.dto.cafe.UploadCafeIconDto
 import io.yeahx4.jasao.entity.cafe.Cafe
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.service.user.UserService
@@ -128,8 +129,19 @@ class CafeController(
         return Res(HttpResponse("Success", null), HttpStatus.OK)
     }
 
-    @GetMapping("/setting")
-    fun getCafeSetting(@RequestParam cafe: Long) {
+    @PostMapping("/auth/icon")
+    fun uploadCafeIcon(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestBody dto: UploadCafeIconDto
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        val cafe = this.cafeService.getCafeByIdentifier(dto.identifier)
+            ?: return Res(HttpResponse("Not Found", null), HttpStatus.NOT_FOUND)
 
+        if (user.id != cafe.owner) {
+            return Res(HttpResponse("Permission denied", null), HttpStatus.FORBIDDEN)
+        }
+
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 }

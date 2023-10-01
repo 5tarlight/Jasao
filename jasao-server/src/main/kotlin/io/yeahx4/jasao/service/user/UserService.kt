@@ -90,6 +90,7 @@ class UserService(
             "cdn",
             "public",
             "images",
+            "user",
             owner.toString()
         ).joinToString(File.separator)
         val targetPath = File(path)
@@ -124,6 +125,7 @@ class UserService(
             "cdn",
             "public",
             "images",
+            "user",
             user.toString(),
             "profile" + (if (isJgp) ".jpg" else ".png")
         ).joinToString(File.separator)

@@ -15,7 +15,8 @@ class CafeService(private val cafeRepository: CafeRepository) {
             dto.identifier,
             dto.name,
             dto.description ?: "",
-            owner
+            owner,
+            null,
         ))
     }
 
