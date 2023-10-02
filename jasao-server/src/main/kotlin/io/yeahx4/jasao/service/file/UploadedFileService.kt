@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service
  */
 @Service
 class UploadedFileService(private val uploadedFileRepository: UploadedFileRepository) {
-    fun saveProfileImage(user: Long, ext: String) {
+    fun saveProfileImage(user: Long, ext: String, path: String) {
         this.uploadedFileRepository.save(
             UploadedFile(
                 "",
                 user,
-                "/images/user/${user}/profile${ext}",
+                path,
                 UploadedFileRole.PROFILE,
                 if (ext == ".png") FileExtension.PNG else FileExtension.JPEG,
                 encodeBase64("role=${Payload.PROFILE_IMAGE}")
@@ -41,7 +41,7 @@ class UploadedFileService(private val uploadedFileRepository: UploadedFileReposi
         return this.uploadedFileRepository.findByOwner(user)
     }
 
-    fun saveCafeIcon(cafe: String, ext: String, user: Long) {
+    fun saveCafeIcon(cafe: String, ext: String, user: Long, path: String) {
         this.uploadedFileRepository.save(
             UploadedFile(
                 "",

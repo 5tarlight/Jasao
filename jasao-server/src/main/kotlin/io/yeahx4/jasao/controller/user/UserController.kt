@@ -461,12 +461,8 @@ class UserController(
         val user = this.jwtService.getUserFromToken(jwt)
 
         val ext = when (file.contentType) {
-            "image/jpeg" -> {
-                ".jpg"
-            }
-            "image/png" -> {
-                ".png"
-            }
+            "image/jpeg" -> ".jpg"
+            "image/png" -> ".png"
             else -> {
                 return Res(HttpResponse("Invalid file format", null), HttpStatus.BAD_REQUEST)
             }
@@ -474,12 +470,12 @@ class UserController(
 
         val path = this.userService.saveProfileImage(user.id, file, ext)
 
-        if (user.profile != "") {
+        if (user.profile != "") { // if already had profile image
             val img = this.uploadedFileService.getProfileImageByOwner(user.id)!!
             img.extension = if (ext == ".jpg") FileExtension.JPEG else FileExtension.PNG
-            img.path = "/images/${user.id}/profile${ext}"
+            img.path = path
         } else {
-            this.uploadedFileService.saveProfileImage(user.id, ext)
+            this.uploadedFileService.saveProfileImage(user.id, ext, path)
         }
 
         val dbUser = userService.getUserById(user.id)!!
