@@ -19,6 +19,7 @@ import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.MessageHttpResponse
 import io.yeahx4.jasao.util.MsgRes
 import io.yeahx4.jasao.util.Res
+import io.yeahx4.jasao.util.getExtension
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
@@ -450,7 +451,7 @@ class UserController(
      *
      * # Response
      * - 200 : Success
-     * - 400 : Invalid file format. Not jpg or png
+     * - 400 : Invalid file format.
      */
     @PostMapping("/auth/profile")
     @Transactional
@@ -460,22 +461,22 @@ class UserController(
     ): Res<String> {
         val user = this.jwtService.getUserFromToken(jwt)
 
-        val ext = when (file.contentType) {
-            "image/jpeg" -> ".jpg"
-            "image/png" -> ".png"
-            else -> {
-                return Res(HttpResponse("Invalid file format", null), HttpStatus.BAD_REQUEST)
-            }
-        }
+        val ext = getExtension(file);
 
-        val path = this.userService.saveProfileImage(user.id, file, ext)
+        if (!ext.isImage())
+            return Res(
+                HttpResponse("Invalid File Format", null),
+                HttpStatus.BAD_REQUEST
+            )
+
+        val path = this.userService.saveProfileImage(user.id, file, ext.toExtension())
 
         if (user.profile != "") { // if already had profile image
             val img = this.uploadedFileService.getProfileImageByOwner(user.id)!!
-            img.extension = if (ext == ".jpg") FileExtension.JPEG else FileExtension.PNG
+            img.extension = ext
             img.path = path
         } else {
-            this.uploadedFileService.saveProfileImage(user.id, ext, path)
+            this.uploadedFileService.saveProfileImage(user.id, ext.toExtension(), path)
         }
 
         val dbUser = userService.getUserById(user.id)!!
