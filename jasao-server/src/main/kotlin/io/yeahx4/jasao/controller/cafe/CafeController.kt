@@ -8,8 +8,10 @@ import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.service.user.UserService
 import io.yeahx4.jasao.service.cafe.CafeService
 import io.yeahx4.jasao.service.cafe.CafeSettingService
+import io.yeahx4.jasao.service.file.UploadedFileService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.Res
+import io.yeahx4.jasao.util.getExtension
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
@@ -20,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -29,7 +30,8 @@ class CafeController(
     private val cafeService: CafeService,
     private val jwtService: JwtService,
     private val userService: UserService,
-    private val cafeSettingService: CafeSettingService
+    private val cafeSettingService: CafeSettingService,
+    private val uploadedFileService: UploadedFileService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -126,10 +128,11 @@ class CafeController(
         }
 
         this.logger.info("Successfully cafe ${cafe.id} updated by user ${user.id}")
-        return Res(HttpResponse("Success", null), HttpStatus.OK)
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 
     @PostMapping("/auth/icon")
+    @Transactional
     fun uploadCafeIcon(
         @RequestHeader("Authorization") jwt: String,
         @RequestBody dto: UploadCafeIconDto
@@ -141,6 +144,28 @@ class CafeController(
         if (user.id != cafe.owner) {
             return Res(HttpResponse("Permission denied", null), HttpStatus.FORBIDDEN)
         }
+
+        val ext = getExtension(dto.file)
+
+        if (!ext.isImage())
+            return Res(
+                HttpResponse("Invalid File Format", null),
+                HttpStatus.BAD_REQUEST
+            )
+
+        val path = this.cafeService.saveCafeIcon(dto.identifier, dto.file, ext.toString())
+
+        if (cafe.icon != null && cafe.icon != "") {
+            val dbIcon = this.uploadedFileService.getCafeIconByIdentifier(dto.identifier)!!
+            dbIcon.extension = ext
+            dbIcon.path = path
+        } else {
+            this.uploadedFileService.saveCafeIcon(dto.identifier, ext.toString(), user.id, path)
+        }
+
+        cafe.icon = path
+
+        this.logger.info("Cafe ${dto.identifier} icon upload")
 
         return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }

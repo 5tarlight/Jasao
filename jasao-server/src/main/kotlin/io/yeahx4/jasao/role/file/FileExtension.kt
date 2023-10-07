@@ -5,11 +5,11 @@ enum class FileExtension(private val value: String) {
     JPEG("IMAGE_JPEG"),
     OTHER("OTHER");
 
-    fun toExtension(): String {
+    override fun toString(): String {
         return when (this) {
             JPEG -> ".jpg"
             PNG -> ".png"
-            OTHER -> ""
+            OTHER -> ".unknown"
         }
     }
 

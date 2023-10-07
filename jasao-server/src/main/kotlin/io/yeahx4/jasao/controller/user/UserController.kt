@@ -9,7 +9,6 @@ import io.yeahx4.jasao.dto.user.UserDto
 import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.jwt.JwtTokenProvider
-import io.yeahx4.jasao.role.file.FileExtension
 import io.yeahx4.jasao.role.user.UserRole
 import io.yeahx4.jasao.service.file.UploadedFileService
 import io.yeahx4.jasao.service.uuid.UuidService
@@ -469,14 +468,14 @@ class UserController(
                 HttpStatus.BAD_REQUEST
             )
 
-        val path = this.userService.saveProfileImage(user.id, file, ext.toExtension())
+        val path = this.userService.saveProfileImage(user.id, file, ext.toString())
 
         if (user.profile != "") { // if already had profile image
             val img = this.uploadedFileService.getProfileImageByOwner(user.id)!!
             img.extension = ext
             img.path = path
         } else {
-            this.uploadedFileService.saveProfileImage(user.id, ext.toExtension(), path)
+            this.uploadedFileService.saveProfileImage(user.id, ext.toString(), path)
         }
 
         val dbUser = userService.getUserById(user.id)!!
