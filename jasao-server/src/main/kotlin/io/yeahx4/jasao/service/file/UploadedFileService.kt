@@ -64,4 +64,10 @@ class UploadedFileService(private val uploadedFileRepository: UploadedFileReposi
             UploadedFileRole.CAFE_ICON
         )
     }
+
+    fun deleteCafeIcon(owner: Long, identifier: String) {
+        this.uploadedFileRepository.deleteByOwnerAndPayload(
+            owner, encodeBase64("role=${Payload.cafeIcon(identifier)}")
+        )
+    }
 }

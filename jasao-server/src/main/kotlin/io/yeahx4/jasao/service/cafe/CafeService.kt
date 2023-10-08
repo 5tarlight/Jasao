@@ -48,4 +48,13 @@ class CafeService(
             "icon${ext}"
         )
     }
+
+    fun deleteCafeIcon(identifier: String, isJpg: Boolean): Boolean {
+        val ext = if (isJpg) ".jpg" else ".png"
+
+        return this.localFileService.deleteFile(
+            listOf("cafe", identifier),
+            "icon${ext}"
+        )
+    }
 }

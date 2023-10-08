@@ -19,3 +19,7 @@ data class UploadCafeIconDto(
     val file: MultipartFile,
     val identifier: String
 )
+
+data class DeleteCafeIconDto(
+    val identifier: String
+)
