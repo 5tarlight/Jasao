@@ -24,4 +24,7 @@ data class Cafe(
 
     @Column(nullable = false)
     var owner: Long,
+
+    @Column(nullable = true)
+    var icon: String?,
 ): TimeEntity()

@@ -4,6 +4,8 @@ import io.yeahx4.jasao.entity.file.UploadedFile
 import io.yeahx4.jasao.repository.file.UploadedFileRepository
 import io.yeahx4.jasao.role.file.FileExtension
 import io.yeahx4.jasao.role.file.UploadedFileRole
+import io.yeahx4.jasao.util.Payload
+import io.yeahx4.jasao.util.encodeBase64
 import org.springframework.stereotype.Service
 
 /**
@@ -13,16 +15,17 @@ import org.springframework.stereotype.Service
  */
 @Service
 class UploadedFileService(private val uploadedFileRepository: UploadedFileRepository) {
-    fun saveProfileImage(user: Long, ext: String) {
+    fun saveProfileImage(user: Long, ext: String, path: String) {
         this.uploadedFileRepository.save(
             UploadedFile(
                 "",
                 user,
-                "/images/${user}/profile${ext}",
-                UploadedFileRole.PROFILE,
-                if (ext == ".png") FileExtension.PNG else FileExtension.JPEG
+                path,
+                UploadedFileRole.PROFILE_IMAGE,
+                if (ext == ".png") FileExtension.PNG else FileExtension.JPEG,
+                encodeBase64("role=${Payload.PROFILE_IMAGE}")
             )
-        );
+        )
     }
 
     fun deleteProfileImage(user: Long) {
@@ -31,10 +34,40 @@ class UploadedFileService(private val uploadedFileRepository: UploadedFileReposi
 
     @Deprecated("You can infer if profile eixsts through profile field of user")
     fun isProfileExists(user: Long): Boolean {
-        return this.uploadedFileRepository.findByOwner(user) != null
+        return this.uploadedFileRepository.findByOwnerAndRole(
+            user, UploadedFileRole.PROFILE_IMAGE
+        ) != null
     }
 
     fun getProfileImageByOwner(user: Long): UploadedFile? {
-        return this.uploadedFileRepository.findByOwner(user)
+        return this.uploadedFileRepository.findByOwnerAndRole(
+            user, UploadedFileRole.PROFILE_IMAGE
+        )
+    }
+
+    fun saveCafeIcon(cafe: String, ext: String, user: Long, path: String) {
+        this.uploadedFileRepository.save(
+            UploadedFile(
+                "",
+                user,
+                "/images/cafe/${user}/profile${ext}",
+                UploadedFileRole.CAFE_ICON,
+                if (ext == ".png") FileExtension.PNG else FileExtension.JPEG,
+                encodeBase64("role=${Payload.cafeIcon(cafe)}")
+            )
+        )
+    }
+
+    fun getCafeIconByIdentifier(identifier: String): UploadedFile? {
+        return this.uploadedFileRepository.findByPayloadAndRole(
+            encodeBase64("role=${Payload.cafeIcon(identifier)}"),
+            UploadedFileRole.CAFE_ICON
+        )
+    }
+
+    fun deleteCafeIcon(owner: Long, identifier: String) {
+        this.uploadedFileRepository.deleteByOwnerAndPayload(
+            owner, encodeBase64("role=${Payload.cafeIcon(identifier)}")
+        )
     }
 }

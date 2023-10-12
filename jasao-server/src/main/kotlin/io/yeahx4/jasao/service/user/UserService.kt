@@ -3,11 +3,11 @@ package io.yeahx4.jasao.service.user
 import io.yeahx4.jasao.dto.user.SignUpDto
 import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.repository.user.UserRepository
+import io.yeahx4.jasao.service.file.LocalFileService
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
-import java.io.File
 
 /**
  * Service for user system management.
@@ -19,7 +19,8 @@ import java.io.File
 @Service
 class UserService(
     private val userRepository: UserRepository,
-    private val encoder: BCryptPasswordEncoder
+    private val encoder: BCryptPasswordEncoder,
+    private val localFileService: LocalFileService
 ) {
     /**
      * Save User instance to DB.
@@ -84,32 +85,11 @@ class UserService(
      * Uploaded file is stored in public folder of CDN server.
      */
     fun saveProfileImage(owner: Long, file: MultipartFile, ext: String): String {
-        val path = arrayOf(
-            System.getProperty("user.dir"),
-            "..",
-            "cdn",
-            "public",
-            "images",
-            owner.toString()
-        ).joinToString(File.separator)
-        val targetPath = File(path)
-
-        if (!targetPath.exists()) {
-            targetPath.mkdirs()
-        }
-
-        if (file.isEmpty) {
-            return ""
-        }
-
-        val target = File(targetPath, "profile${ext}")
-
-        if (target.exists())
-            target.delete()
-
-        file.transferTo(target)
-
-        return "/images/${owner}/profile${ext}"
+        return this.localFileService.saveFile(
+            listOf("user", "$owner"),
+            file,
+            "profile${ext}"
+        )
     }
 
     /**
@@ -117,22 +97,12 @@ class UserService(
      *
      * @return Success
      */
-    fun deleteProfileImage(user: Long, isJgp: Boolean): Boolean {
-        val path = arrayOf(
-            System.getProperty("user.dir"),
-            "..",
-            "cdn",
-            "public",
-            "images",
-            user.toString(),
-            "profile" + (if (isJgp) ".jpg" else ".png")
-        ).joinToString(File.separator)
-        val file = File(path)
+    fun deleteProfileImage(user: Long, isJpg: Boolean): Boolean {
+        val ext = if (isJpg) ".jpg" else ".png"
 
-        return if (!file.exists()) {
-            false
-        } else {
-            file.delete()
-        }
+        return this.localFileService.deleteFile(
+            listOf("user", "$user"),
+            "profile${ext}"
+        )
     }
 }

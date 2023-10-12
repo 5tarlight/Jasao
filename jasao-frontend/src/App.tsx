@@ -7,10 +7,10 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import SignUp from "./pages/auth/SignUp";
 import Logout from "./pages/auth/Logout";
-import Test from "./pages/test";
+import Test from "./pages/test/test";
 import Footer from "./components/footer/Footer";
 import ViewProfile from "./pages/user/ViewProfile";
-import NewPopupTest from "./pages/newPopupTest";
+import NewPopupTest from "./pages/test/newPopupTest";
 
 const cx = classNames.bind(styles);
 

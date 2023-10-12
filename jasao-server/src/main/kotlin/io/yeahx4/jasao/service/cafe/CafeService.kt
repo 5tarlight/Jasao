@@ -4,18 +4,24 @@ import io.yeahx4.jasao.dto.cafe.CreateCafeDto
 import io.yeahx4.jasao.entity.user.User
 import io.yeahx4.jasao.entity.cafe.Cafe
 import io.yeahx4.jasao.repository.cafe.CafeRepository
+import io.yeahx4.jasao.service.file.LocalFileService
 import io.yeahx4.jasao.util.unwrap
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
-class CafeService(private val cafeRepository: CafeRepository) {
+class CafeService(
+    private val cafeRepository: CafeRepository,
+    private val localFileService: LocalFileService
+) {
     fun create(dto: CreateCafeDto, owner: Long): Cafe {
         return cafeRepository.save(Cafe(
             -1,
             dto.identifier,
             dto.name,
             dto.description ?: "",
-            owner
+            owner,
+            null,
         ))
     }
 
@@ -33,5 +39,22 @@ class CafeService(private val cafeRepository: CafeRepository) {
 
     fun getCafeById(id: Long): Cafe? {
         return unwrap(this.cafeRepository.findById(id))
+    }
+
+    fun saveCafeIcon(identifier: String, file: MultipartFile, ext: String): String {
+        return this.localFileService.saveFile(
+            listOf("cafe", identifier),
+            file,
+            "icon${ext}"
+        )
+    }
+
+    fun deleteCafeIcon(identifier: String, isJpg: Boolean): Boolean {
+        val ext = if (isJpg) ".jpg" else ".png"
+
+        return this.localFileService.deleteFile(
+            listOf("cafe", identifier),
+            "icon${ext}"
+        )
     }
 }

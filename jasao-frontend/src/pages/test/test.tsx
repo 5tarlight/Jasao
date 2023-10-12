@@ -1,9 +1,9 @@
 import { FC, useState } from "react";
-import styles from "../styles/Test.module.scss";
+import styles from "../../styles/Test.module.scss";
 import classNames from "classnames/bind";
 import axios from "axios";
-import { getServer } from "../util/server";
-import { getStorage } from "../util/storage";
+import { getServer } from "../../util/server";
+import { getStorage } from "../../util/storage";
 
 const cx = classNames.bind(styles);
 
@@ -13,7 +13,7 @@ const Test: FC = () => {
   return (
     <>
       <fieldset className={cx("fieldset")}>
-        <legend>파일 업로드</legend>
+        <legend>파일 업로드 (broken)</legend>
         <div>
           <input
             type="file"

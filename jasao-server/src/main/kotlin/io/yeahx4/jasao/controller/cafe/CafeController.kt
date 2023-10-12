@@ -1,17 +1,22 @@
 package io.yeahx4.jasao.controller.cafe
 
 import io.yeahx4.jasao.dto.cafe.CreateCafeDto
+import io.yeahx4.jasao.dto.cafe.DeleteCafeIconDto
 import io.yeahx4.jasao.dto.cafe.UpdateCafeDto
+import io.yeahx4.jasao.dto.cafe.UploadCafeIconDto
 import io.yeahx4.jasao.entity.cafe.Cafe
 import io.yeahx4.jasao.service.user.JwtService
 import io.yeahx4.jasao.service.user.UserService
 import io.yeahx4.jasao.service.cafe.CafeService
 import io.yeahx4.jasao.service.cafe.CafeSettingService
+import io.yeahx4.jasao.service.file.UploadedFileService
 import io.yeahx4.jasao.util.HttpResponse
 import io.yeahx4.jasao.util.Res
+import io.yeahx4.jasao.util.getExtension
 import jakarta.transaction.Transactional
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,7 +24,6 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -28,7 +32,8 @@ class CafeController(
     private val cafeService: CafeService,
     private val jwtService: JwtService,
     private val userService: UserService,
-    private val cafeSettingService: CafeSettingService
+    private val cafeSettingService: CafeSettingService,
+    private val uploadedFileService: UploadedFileService
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -125,11 +130,70 @@ class CafeController(
         }
 
         this.logger.info("Successfully cafe ${cafe.id} updated by user ${user.id}")
-        return Res(HttpResponse("Success", null), HttpStatus.OK)
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
     }
 
-    @GetMapping("/setting")
-    fun getCafeSetting(@RequestParam cafe: Long) {
+    @PostMapping("/auth/icon")
+    @Transactional
+    fun uploadCafeIcon(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestBody dto: UploadCafeIconDto
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt)
+        val cafe = this.cafeService.getCafeByIdentifier(dto.identifier)
+            ?: return Res(HttpResponse("Not Found", null), HttpStatus.NOT_FOUND)
 
+        if (user.id != cafe.owner) {
+            return Res(HttpResponse("Permission denied", null), HttpStatus.FORBIDDEN)
+        }
+
+        val ext = getExtension(dto.file)
+
+        if (!ext.isImage())
+            return Res(
+                HttpResponse("Invalid File Format", null),
+                HttpStatus.BAD_REQUEST
+            )
+
+        val path = this.cafeService.saveCafeIcon(dto.identifier, dto.file, ext.toString())
+
+        if (cafe.icon != null && cafe.icon != "") {
+            val dbIcon = this.uploadedFileService.getCafeIconByIdentifier(dto.identifier)!!
+            dbIcon.extension = ext
+            dbIcon.path = path
+        } else {
+            this.uploadedFileService.saveCafeIcon(dto.identifier, ext.toString(), user.id, path)
+        }
+
+        cafe.icon = path
+
+        this.logger.info("Cafe ${dto.identifier} icon upload")
+
+        return Res(HttpResponse("Ok", null), HttpStatus.OK)
+    }
+
+    @DeleteMapping("/auth/icon")
+    fun deleteCafeIcon(
+        @RequestHeader("Authorization") jwt: String,
+        @RequestBody dto: DeleteCafeIconDto
+    ): Res<String> {
+        val user = this.jwtService.getUserFromToken(jwt);
+        val cafe = this.cafeService.getCafeByIdentifier(dto.identifier)
+            ?: return Res(HttpResponse("Invalid Cafe Identifier", null), HttpStatus.NOT_FOUND)
+
+        if (user.id != cafe.owner)
+            return Res(HttpResponse("Permission Denied", null), HttpStatus.FORBIDDEN)
+
+        return if (
+            cafe.icon != null &&
+            this.cafeService.deleteCafeIcon(dto.identifier, cafe.icon!!.endsWith(".jpg"))
+        ) {
+            this.uploadedFileService.deleteCafeIcon(user.id, dto.identifier)
+            cafe.icon = null
+            Res(HttpResponse("Ok", null), HttpStatus.OK)
+        } else {
+            this.logger.warn("User ${user.id} tried to delete non-exist cafe image of ${dto.identifier}")
+            Res(HttpResponse("File not exists", null), HttpStatus.BAD_REQUEST)
+        }
     }
 }
